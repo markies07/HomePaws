@@ -30,7 +30,7 @@ function NewMessage({setIsNewMessage, closeUI}) {
 
         const q = query(
             collection(db, 'chats'),
-            where('participants', 'array-contains', receiver)
+            where('participants', 'array-contains', receiver && user.uid)
         );
 
         const querySnapshot = await getDocs(q);

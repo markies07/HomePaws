@@ -1,14 +1,16 @@
 import React, { useContext, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
-import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 function Reject({application, closeReject, petImage}) {
     const [rejectReason, setRejectReason] = useState('');
     const [loading, setLoading] = useState(false);
     const {user, userData} = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleRejectApplication = async () => {
         setLoading(true);
@@ -26,19 +28,12 @@ function Reject({application, closeReject, petImage}) {
 
             const applicationData = applicationSnap.data();
 
-            await updateDoc(applicationRef, {
-                status: 'rejected',
-            });
-
             await setDoc(doc(db, 'rejectedApplications', application.applicationID), {
                 ...applicationData,
-                adopterID: application.adopterUserID,
-                applicationID: application.applicationID,
-                petID: application.petID,
+                petImage: petImage,
                 status: 'rejected',
                 rejectReason: rejectReason,
                 rejectedAt: serverTimestamp(),
-                petOwnerID: application.petOwnerID,
             });
 
 
@@ -47,7 +42,7 @@ function Reject({application, closeReject, petImage}) {
             await addDoc(notificationRef, {
                 content: 'rejected your adoption application.',
                 applicationID: application.applicationID,
-                type: 'adoption',
+                type: 'rejected',
                 image: petImage,
                 senderName: application.petName+'\'s pet owner',
                 senderId: user.uid,
@@ -56,10 +51,10 @@ function Reject({application, closeReject, petImage}) {
                 timestamp: serverTimestamp(),
             });
 
+            await deleteDoc(applicationRef);
+
             notifySuccessOrange('Submitted successfully!');
-            setTimeout(() => {
-                window.location.reload();
-            }, [2000]);
+            navigate('/dashboard/profile');
         }
         catch(error){
             console.error(error);

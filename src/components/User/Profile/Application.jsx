@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import close from './assets/close.svg'
 import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../../firebase/firebase'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../../General/AuthProvider'
 import Reject from './Reject'
 import RejectionDetails from './RejectionDetails'
@@ -12,15 +12,20 @@ function Application() {
     const navigate = useNavigate();
     const {user, userData} = useContext(AuthContext);
     const { applicationID } = useParams();
+    const location = useLocation();
     const [applicationData, setApplicationData] = useState({});
     const [petData, setPetData] = useState({});
     const [isRejectOpen, setIsRejectOpen] = useState(false);
     const [isRejectionDetailsOpen, setIsRejectionDetailsOpen] = useState(false);
 
+
     useEffect(() => {
         const fetchApplication = async () => {
             try{
-                const docRef = doc(db, 'adoptionApplications', applicationID);
+                const collectionName = location.pathname.includes('closed') ? 'closedApplications' : location.pathname.includes('rejected') ? 'rejectedApplications' : 'adoptionApplications';
+                console.log(collectionName)
+
+                const docRef = doc(db, collectionName, applicationID);
                 const docSnap = await getDoc(docRef);
 
                 if(docSnap.exists()){
@@ -138,7 +143,7 @@ function Application() {
                 <div className='flex flex-col gap-4 justify-center items-center w-full'>
                     <h1 className='text-2xl sm:text-3xl font-medium text-center pt-7'>Adoption Application</h1>
                     <div className='w-60 mb-5 duration-150 relative h-64 flex flex-col drop-shadow-md rounded-xl overflow-hidden'>
-                        <img draggable='false' src={image} className='h-full w-full object-cover bg-text' alt="" />
+                        <img draggable='false' src={image || applicationData.petImage} className='h-full w-full object-cover bg-text' alt="" />
                         <p className='absolute font-medium flex justify-center items-center text-[#5D5D5D] bottom-0 bg-[#FAFAFA] w-full h-10'>{applicationData.petName}</p>
                     </div>
                 </div>
@@ -238,7 +243,7 @@ function Application() {
                     </div>
 
                     {/* REVIEWING APPLICAITON */}
-                    <div className={`pt-5 pb-2 justify-center gap-3 sm:gap-5 ${applicationData.petOwnerID !== user.uid && applicationData.status !== 'rejected' && applicationData.status !== 'accepted' ? 'flex' : 'hidden'}`}>
+                    <div className={`pt-5 pb-2 justify-center gap-3 sm:gap-5 ${applicationData.petOwnerID !== user.uid && applicationData.status !== 'rejected' && applicationData.status !== 'accepted' && applicationData.status !== 'closed' ? 'flex' : 'hidden'}`}>
                         <p className='border-2 border-primary font-medium text-primary bg-secondary py-2 px-6 text-sm sm:text-base rounded-full'>Application Under Review</p>
                     </div>
 

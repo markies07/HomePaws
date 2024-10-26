@@ -14,7 +14,6 @@ import { AuthContext } from '../../General/AuthProvider'
 import LoadingScreen from '../../General/LoadingScreen'
 import AdoptionContract from './AdoptionContract'
 import CancelRehome from './CancelRehome'
-import paw from './assets/white-paw.svg'
 
 function AcceptedApplication() {
     const {user, userData } = useContext(AuthContext);
@@ -96,6 +95,24 @@ function AcceptedApplication() {
         }
     }, [applicationID]);
 
+    useEffect(() => {
+        const updateStatus = async () => {
+      
+            if (data?.meetupSchedule?.meetUpDate === today ) {
+                setIsMeetup(true);
+            } else {
+                    console.log('Condition not met, status not updated');
+            }
+        };
+      
+        if (data) {
+            updateStatus();
+        } else {
+            console.log('Data is not available yet');
+        }
+      }, [data, today, db]);
+
+
 
     const toggleSchedule = () => {
         setIsScheduleOpen(!isScheduleOpen);
@@ -122,7 +139,7 @@ function AcceptedApplication() {
 
         const q = query(
             collection(db, 'chats'),
-            where('participants', 'array-contains', receiver)
+            where('participants', 'array-contains', receiver && user.uid)
         );
 
         const querySnapshot = await getDocs(q);

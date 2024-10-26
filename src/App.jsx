@@ -75,6 +75,7 @@ function App() {
                         <Route path="profile/applications/rehomed/:rehomedID" element={<RehomedPets />} />
                         <Route path="profile/applications/active/application/:applicationID" element={<Application />} />
                         <Route path="profile/applications/application/:applicationID" element={<Application />} />
+                        <Route path="profile/applications/closed/application/:applicationID" element={<Application />} />
                         <Route path="profile/applications/rejected/application/:applicationID" element={<Application />} />
 
                       </Route>

@@ -39,11 +39,11 @@ function AdoptionApplications({initialTab}) {
           case 'Accepted':
               return <Accepted petImages={petImages} userImages={userImages} loading={loading} otherApplications={otherApplications} myApplications={myApplications} />;
           case 'Rejected':
-              return <Rejected petImages={petImages} userImages={userImages} loading={loading} otherApplications={otherApplications} myApplications={myApplications} />;
+              return <Rejected />;
           case 'Closed':
-              return <Closed petImages={petImages} userImages={userImages} loading={loading} otherApplications={otherApplications} myApplications={myApplications} />;
+              return <Closed />;
           case 'Rehomed':
-              return <Rehomed petImages={petImages} userImages={userImages} loading={loading} otherApplications={otherApplications} myApplications={myApplications} />;
+              return <Rehomed />;
           default:
               return <Active petImages={petImages} userImages={userImages} loading={loading} otherApplications={otherApplications} myApplications={myApplications} />;
       }

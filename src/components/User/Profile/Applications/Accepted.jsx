@@ -1,18 +1,41 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../../General/AuthProvider'
-import { collection, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
 import accepted from '../assets/accepted.svg';
 
 
-function Accepted({petImages, userImages}) {
+function Accepted({petImages}) {
   const [filter, setFilter] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [adopterProfiles, setAdopterProfiles] = useState({});
+  const [adopterName, setAdopterName] = useState({});
   const {user, userData} = useContext(AuthContext);
   const [otherApplications, setOtherApplications] = useState([]);
   const [myApplications, setMyApplications] = useState([]);
   const navigate = useNavigate();
+
+  const fetchAdopterProfile = async (adopterUserID) => {
+    try {
+      const userRef = doc(db, 'users', adopterUserID);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        setAdopterProfiles(prev => ({
+          ...prev,
+          [adopterUserID]: userData.profilePictureURL || '',
+        }));
+        setAdopterName(prev => ({
+          ...prev,
+          [adopterUserID]: userData.fullName,
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching adopter profile:', error);
+    }
+  };
 
   const fetchAcceptedApplications = async () => {
       try{
@@ -37,6 +60,8 @@ function Accepted({petImages, userImages}) {
             id: doc.id,
             ...doc.data(),
         }));
+
+        await Promise.all(otherApplications.map(app => fetchAdopterProfile(app.adopterUserID)));
 
         const myApplications = mySnapshot.docs.map(doc => ({
             id: doc.id,
@@ -86,29 +111,16 @@ function Accepted({petImages, userImages}) {
       }
   };
 
-  const read = async (applicationID, adopterID) => {
-
-    if(adopterID !== user.uid){
-      const applciationRef = doc(db, 'acceptedApplications', applicationID);
-      
-      await updateDoc(applciationRef, {
-        read: true,
-      });
-    }
-    
-    navigate(`${applicationID}`)
-  }
-
 
   const renderApplication = (application, isMyApplication) => (
-      <div key={application.id} onClick={() => read(application.id, application.adopterUserID)} className='bg-secondary relative items-center flex shadow-custom hover:bg-[#f1f1f1] duration-150 cursor-pointer w-full p-3 rounded-lg'>
+      <div key={application.id} onClick={() => navigate(`${application.applicationID}`)} className='bg-secondary relative items-center flex shadow-custom hover:bg-[#f1f1f1] duration-150 cursor-pointer w-full p-3 rounded-lg'>
         <div className='relative w-12 h-12 shrink-0'>
-          <img className='w-full h-full bg-text object-cover rounded-full' src={isMyApplication ? petImages[application.id] : userImages[application.id]} alt="" />
+          <img className='w-full h-full bg-text object-cover rounded-full' src={isMyApplication ? petImages[application.id] : (adopterProfiles[application.adopterUserID])}  alt="" />
           <img className='w-7 h-7 absolute rounded-full bottom-0 -right-1' src={accepted} alt="" />
         </div>
         <div className={`pl-3 flex flex-col justify-center`}>
           <p className={`${application.read === false && application.adopterUserID !== user.uid ? 'pr-7 sm:pr-10' : ''} font-semibold text-sm sm:text-base leading-4`}>
-            {isMyApplication ? 'Your' : application.adopterName+'\'s'} <span className='font-normal'>adoption application for {application.petName} has been <span className='font-semibold text-[#4CAF50]'>accepted</span>.</span>
+            {isMyApplication ? 'Your' : (adopterName[application.adopterUserID])+'\'s'} <span className='font-normal'>adoption application for {application.petName} has been <span className='font-semibold text-[#4CAF50]'>accepted</span>.</span>
           </p>
           <p className='text-xs sm:text-[13px] text-[#8a8a8a] mt-1 sm:mt-0'>{getTimeDifference(application.acceptedDate)}</p>
         </div>
@@ -156,7 +168,7 @@ function Accepted({petImages, userImages}) {
                     {filteredApplications()}
                 </div>
             ) : (
-                <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">No Application</div>
+                <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">No Accepted Application Found</div>
             )}
         </div>
 

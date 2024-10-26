@@ -1,14 +1,91 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../../General/AuthProvider'
-import { doc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, orderBy, query, updateDoc, where, getDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
 import pending from '../assets/pending.svg';
 
-function Active({loading, otherApplications, myApplications, petImages, userImages}) {
+function Active() {
+    const [activeApplications, setActiveApplications] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('All');
-    const {user, userData} = useContext(AuthContext);
+    const [adopterProfiles, setAdopterProfiles] = useState({});
+    const [adopterName, setAdopterName] = useState({});
+    const [otherApplications, setOtherApplications] = useState([]);
+    const [myApplications, setMyApplications] = useState([]);
+    const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const fetchAdopterProfile = async (adopterUserID) => {
+      try {
+        const userRef = doc(db, 'users', adopterUserID);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setAdopterProfiles(prev => ({
+            ...prev,
+            [adopterUserID]: userData.profilePictureURL || '',
+          }));
+          setAdopterName(prev => ({
+            ...prev,
+            [adopterUserID]: userData.fullName,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching adopter profile:', error);
+      }
+    };
+
+
+    const fetchActiveApplications = async () => {
+      try{
+        const otherApplicationsRef = query(
+            collection(db, 'adoptionApplications'), 
+            where('petOwnerID' , '==', user.uid), 
+            where('status', '==', 'pending'),
+            orderBy('dateSubmitted', 'desc')
+        );
+  
+        const myApplicationsRef = query(
+            collection(db, 'adoptionApplications'), 
+            where('adopterUserID' , '==', user.uid), 
+            where('status', '==', 'pending'),
+            orderBy('dateSubmitted', 'desc')
+        );
+  
+        const [otherSnapshot, mySnapshot] = await Promise.all([
+            getDocs(otherApplicationsRef),
+            getDocs(myApplicationsRef)
+        ]);
+  
+        const otherApplications = otherSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+  
+        // Fetch profile pictures for other applications
+        await Promise.all(otherApplications.map(app => fetchAdopterProfile(app.adopterUserID)));
+  
+        const myApplications = mySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+  
+        setOtherApplications(otherApplications);
+        setMyApplications(myApplications);
+      }
+      catch(error){
+          console.error(error);
+      }
+      finally{
+          setLoading(false);
+      }
+    }
+  
+    useEffect(() => {
+      fetchActiveApplications();
+    }, []);
 
 
     const getTimeDifference = (timestamp) => {
@@ -39,38 +116,23 @@ function Active({loading, otherApplications, myApplications, petImages, userImag
         }
     };
 
-    const read = async (applicationID, adopterID) => {
-
-      if(adopterID !== user.uid){
-        const applciationRef = doc(db, 'adoptionApplications', applicationID);
-        
-        await updateDoc(applciationRef, {
-          read: true,
-        });
-      }
-      
-      navigate(`application/${applicationID}`)
-    }
-
-
     const renderApplication = (application, isMyApplication) => (
-        <div key={application.id} onClick={() => read(application.id, application.adopterUserID)} className='bg-secondary relative items-center flex shadow-custom hover:bg-[#f1f1f1] duration-150 cursor-pointer w-full p-3 rounded-lg'>
-          <div className='relative w-12 h-12 shrink-0'>
-            <img className='w-full h-full bg-text object-cover rounded-full' src={isMyApplication ? petImages[application.id] : userImages[application.id]} alt="" />
-            <img className='w-7 h-7 absolute rounded-full bottom-0 -right-1' src={pending} alt="" />
-          </div>
-          <div className={`pl-3 flex flex-col justify-center`}>
-            <p className={`${application.read === false && application.adopterUserID !== user.uid ? 'pr-7 sm:pr-10' : ''} font-semibold text-sm sm:text-base leading-4`}>
-              {isMyApplication ? 'You' : application.adopterName} <span className='font-normal'>submitted adoption application for {application.petName}.</span>
-            </p>
-            <p className='text-xs sm:text-[13px] text-[#8a8a8a] mt-1 sm:mt-0'>{getTimeDifference(application.dateSubmitted)}</p>
-          </div>
-
-          {/* UNREAD */}
-          <div className={`${application.read === false && application.adopterUserID !== user.uid ? 'flex' : 'hidden'} absolute right-3 sm:right-5 top-0 h-full items-center justify-center`}>
-            <div className='w-4 h-4 bg-primary rounded-full' />
-          </div>
+      <div key={application.id} onClick={() => navigate(`application/${application.applicationID}`)} className='bg-secondary relative items-center flex shadow-custom hover:bg-[#f1f1f1] duration-150 cursor-pointer w-full p-3 rounded-lg'>
+        <div className='relative w-12 h-12 shrink-0'>
+          <img 
+            className='w-full h-full bg-text object-cover rounded-full' 
+            src={isMyApplication ? application.petImage : (adopterProfiles[application.adopterUserID])} 
+            alt="" 
+          />
+          <img className='w-7 h-7 absolute rounded-full bottom-0 -right-1' src={pending} alt="" />
         </div>
+        <div className={`pl-3 flex flex-col justify-center`}>
+          <p className={`${application.read === false && application.adopterUserID !== user.uid ? 'pr-7 sm:pr-10' : ''} font-semibold text-sm sm:text-base leading-4`}>
+            {isMyApplication ? 'Your' : (adopterName[application.adopterUserID])+'\'s'} <span className='font-normal'>submitted an adoption application for {application.petName}.</span>
+          </p>
+          <p className='text-xs sm:text-[13px] text-[#8a8a8a] mt-1 sm:mt-0'>{getTimeDifference(application.dateSubmitted)}</p>
+        </div>
+      </div>
     );
 
     const filteredApplications = () => {
@@ -108,7 +170,7 @@ function Active({loading, otherApplications, myApplications, petImages, userImag
                         {filteredApplications()}
                     </div>
                 ) : (
-                    <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">No Application</div>
+                    <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">No Active Application Found</div>
                 )}
             </div>
 

@@ -1,29 +1,31 @@
-import React, { useContext } from 'react'
-import { AuthContext } from '../../General/AuthProvider'
-import paw from './assets/white-paw.svg'
-import { collection, doc, getDocs, query, serverTimestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
+import React, { useContext } from 'react';
+import { AuthContext } from '../../General/AuthProvider';
+import paw from './assets/white-paw.svg';
+import { collection, doc, getDocs, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { confirm, successAlert } from '../../General/CustomAlert';
 import { useNavigate } from 'react-router-dom';
-import rehomed from './assets/rehomed.svg';
+import rehomed from './assets/rehomed.png';
 
-function RehomedComplete({data, pet}) {
-    const {user} = useContext(AuthContext);
-    const navigation = useNavigate();
+function RehomedComplete({ data, pet }) {
+    const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const RehomeComplete = async () => {
         confirm(`Rehome Complete`, `Are you sure rehoming ${pet.petName} is completed?`).then(async (result) => {
-            if(result.isConfirmed){
-                try{
+            if (result.isConfirmed) {
+                try {
                     const batch = writeBatch(db);
-
                     const rehomedRef = doc(collection(db, 'rehomedPets'));
                     const rehomedID = rehomedRef.id;
-        
+
+                    // Step 1: Store the application to `rehomedPets`
                     const rehomedData = {
                         rehomedID: rehomedID,
                         adopterUserID: data.adopterUserID,
                         ownerUserID: pet.userID,
+                        meetupSchedule: data.meetupSchedule,
+                        timestamp: serverTimestamp(),
                         adopterDetails: {
                             acceptedDate: data.acceptedDate,
                             adopterEmail: data.adopterEmail,
@@ -33,20 +35,14 @@ function RehomedComplete({data, pet}) {
                             adopterContact: data.contactNumber,
                             adopterBirthday: data.dateOfBirth,
                             dateSubmitted: data.dateSubmitted,
-                            adopterName: data.adopterName,
                             adopterAddress: data.fullAddress,
                             adopterGender: data.gender,
-                            adopterName: data.adopterName,
                             adopterOccupation: data.occupation,
-                            adopterName: data.adopterName
                         },
-
                         petDetails: {
                             aboutPet: pet.aboutPet,
                             adoptionFee: pet.adoptionFee,
                             petAge: pet.age,
-                            aboutPet: pet.aboutPet,
-                            breed: pet.breed,
                             color: pet.color,
                             ownerContact: pet.contactNumber,
                             ownerGender: pet.ownerGender,
@@ -55,107 +51,141 @@ function RehomedComplete({data, pet}) {
                             ownerAge: pet.ownerAge,
                             ownerName: pet.ownerName,
                             ownerEmail: data.petOwnerEmail,
-                            aboutPet: pet.aboutPet,
                             petImages: pet.petImages,
                             petName: pet.petName,
                             petType: pet.petType,
                             petSize: pet.size,
                             timePosted: pet.timePosted,
                         },
-
-                        meetupSchedule: {
-                            meetupSchedule: data.meetupSchedule,
-                            timestamp: serverTimestamp(),
-                        }
                     };
+                    batch.set(rehomedRef, rehomedData);
 
-                    // DELETE NOTIFICATIONS RELATED TO THE APPLICATION
+                    // Step 2: Delete the application from `adoptionApplications`
+                    const adoptionApplicationRef = doc(db, 'adoptionApplications', data.applicationID);
+                    batch.delete(adoptionApplicationRef);
+
+                    // Step 3: Notify both users that rehoming is completed
+                    const petImage = pet.petImages && pet.petImages.length > 0 ? pet.petImages[0] : rehomed;
+
+                    const petOwnerNotificationRef = doc(collection(db, 'notifications'));
+                    const adopterNotificationRef = doc(collection(db, 'notifications'));
+                    
+                    const notificationDataTemplate = {
+                        rehomed: true,
+                        applicationID: rehomedID,
+                        content: `has been successfully rehomed!`,
+                        isRead: false,
+                        image: petImage,
+                        type: 'rehome',
+                        timestamp: serverTimestamp(),
+                    };
+                    
+                    batch.set(petOwnerNotificationRef, {
+                        ...notificationDataTemplate,
+                        senderID: data.adopterUserID,
+                        userId: data.petOwnerID,
+                        senderName: pet.petName,
+                    });
+                    
+                    batch.set(adopterNotificationRef, {
+                        ...notificationDataTemplate,
+                        senderID: data.petOwnerID,
+                        userId: data.adopterUserID,
+                        senderName: pet.petName,
+                    });
+
+                    // Step 4: Move remaining applications to `closedApplications` and notify users
+                    const applicationsQuery = query(
+                        collection(db, 'adoptionApplications'),
+                        where('petID', '==', data.petID),
+                        where('status', '!=', 'accepted')
+                    );
+                    const applicationsSnapshot = await getDocs(applicationsQuery);
+
+                    applicationsSnapshot.forEach((appDoc) => {
+                        const applicationData = appDoc.data();
+                        const closedApplicationRef = doc(db, 'closedApplications', appDoc.id);
+
+                        // Move to `closedApplications`
+                        batch.set(closedApplicationRef, {
+                            ...applicationData,
+                            petImage: petImage,
+                            status: 'closed',
+                            timestamp: serverTimestamp(),
+                        });
+
+                        // Delete from adoptionApplications
+                        const adoptionAppRef = doc(db, 'adoptionApplications', appDoc.id);
+                        batch.delete(adoptionAppRef);
+
+                        // Notify user of closed application
+                        const notificationRef = doc(collection(db, 'notifications'));
+                        batch.set(notificationRef, {
+                            image: petImage,
+                            userId: applicationData.adopterUserID,
+                            content: `adoption application for ${pet.petName} has been closed.`,
+                            isRead: false,
+                            senderName: 'Your',
+                            senderId: user.uid,
+                            timestamp: serverTimestamp(),
+                            type: 'closed',
+                            applicationID: applicationData.applicationID,
+                        });
+                    });
+
+                    // Step 5: Delete all related notifications for the current applicationID
                     const notificationsQuery = query(
                         collection(db, 'notifications'),
                         where('applicationID', '==', data.applicationID)
                     );
-                    try {
-                        const notificationsSnapshot = await getDocs(notificationsQuery);
-                    
-                        // Check if any documents were returned
-                        if (!notificationsSnapshot.empty) {
-                            notificationsSnapshot.forEach((notificationDoc) => {
-                                batch.delete(notificationDoc.ref);
-                            });
-                            console.log(`Deleted ${notificationsSnapshot.size} notifications for applicationID: ${data.applicationID}`);
-                        } else {
-                            console.warn(`No notifications found for applicationID: ${data.applicationID}`);
-                        }
-                    } catch (error) {
-                        console.error('Error deleting notifications: ', error);
-                    }
+                    const notificationsSnapshot = await getDocs(notificationsQuery);
 
-                    // ADD A NEW NOTIFICATION (Pet successfully rehomed)
-                    const petOwnerNotificationRef  = doc(collection(db, 'notifications'));
-                    const adopterNotificationRef = doc(collection(db, 'notifications'));
+                    notificationsSnapshot.forEach((notificationDoc) => {
+                        batch.delete(notificationDoc.ref);
+                    });
 
-                    const petOwnerNotificationData = {
-                        rehomed: true,
-                        applicationID: rehomedID, // rehomedID is now the applicationID in rehomedPets
-                        content: `has been successfully rehomed!`,
-                        isRead: false,
-                        image: rehomed, // You can change this based on who should receive the notification
-                        type: 'rehome',
-                        senderID: data.adopterUserID,
-                        userId: data.petOwnerID,
-                        senderName: pet.petName,
-                        timestamp: serverTimestamp(),
-                    };
+                     // Delete all notifications related to the petID
+                     const petNotificationsQuery = query(
+                        collection(db, 'notifications'),
+                        where('petId', '==', data.petID)
+                    );
+                    const petNotificationsSnapshot = await getDocs(petNotificationsQuery);
 
-                    const adopterNotificationData = {
-                        rehomed: true,
-                        applicationID: rehomedID, // rehomedID is now the applicationID in rehomedPets
-                        content: `has been successfully rehomed!`,
-                        isRead: false,
-                        image: rehomed, // You can change this based on who should receive the notification
-                        type: 'rehome',
-                        senderID: data.petOwnerID,
-                        userId: data.adopterUserID,
-                        senderName: pet.petName,
-                        timestamp: serverTimestamp(),
-                    };
+                    petNotificationsSnapshot.forEach((notificationDoc) => {
+                        batch.delete(notificationDoc.ref);
+                    });
 
-                    // ADDING BOTH NOTIFICATIONS TO BATCH
-                    batch.set(petOwnerNotificationRef, petOwnerNotificationData);
-                    batch.set(adopterNotificationRef, adopterNotificationData);
-        
-                    // STORING IN FIRESTORE
-                    batch.set(rehomedRef, rehomedData);
-        
-                    // DELETING IN ADOPTION APPLICATIONS
-                    const adoptionApplicationRef = doc(db, 'adoptionApplications', data.applicationID);
-                    batch.delete(adoptionApplicationRef);
-
-                    // DELETING IN ACCEPTED APPLICATIONS
+                    // Step 6: Delete from `acceptedApplications`
                     const acceptedApplicationRef = doc(db, 'acceptedApplications', data.applicationID);
                     batch.delete(acceptedApplicationRef);
-        
-                    // DELETING PET FOR ADOPTION
+
+                    // Step 7: Delete the pet information from `petsForAdoption`
                     const petsForAdoptionRef = doc(db, 'petsForAdoption', data.petID);
                     batch.delete(petsForAdoptionRef);
-        
+
+                    // Commit all operations in a batch
                     await batch.commit();
                     successAlert(`${pet.petName} successfully rehomed!`);
-                    navigation(`/dashboard/profile/applications/rehomed/${rehomedID}`);
-        
-                }
-                catch(error){
-                    console.error(error);
+                    navigate(`/dashboard/profile/applications/rehomed/${rehomedID}`);
+
+                } catch (error) {
+                    console.error("Error completing rehoming process: ", error);
                 }
             }
-        })
-    }
+        });
+    };
 
     return (
         <div>
-            <button onClick={RehomeComplete} className={`${data.status === 'meetup' && data.petOwnerID === user.uid ? 'flex' : 'hidden'} bg-[#84B725] hover:bg-[#76a321] text-xs md:text-base cursor-pointer duration-150  items-center font-medium gap-2 text-white p-2 rounded-md`}><img className='w-5 h-5' src={paw} alt="" />Rehome Complete</button>
+            <button
+                onClick={RehomeComplete}
+                className={`${data.status === 'meetup' && data.petOwnerID === user.uid ? 'flex' : 'hidden'} bg-[#84B725] hover:bg-[#76a321] text-xs md:text-base cursor-pointer duration-150 items-center font-medium gap-2 text-white p-2 rounded-md`}
+            >
+                <img className="w-5 h-5" src={paw} alt="" />
+                Rehome Complete
+            </button>
         </div>
-    )
+    );
 }
 
-export default RehomedComplete
+export default RehomedComplete;
