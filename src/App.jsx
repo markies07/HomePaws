@@ -23,6 +23,7 @@ import Post from "./components/User/Notification/Post"
 import AdoptionApplications from "./components/User/Profile/AdoptionApplications"
 import AcceptedApplication from "./components/User/Profile/AcceptedApplication"
 import RehomedPets from "./components/User/Profile/RehomedPets"
+import ViewProfile from "./components/User/Profile/View Profile/ViewProfile"
 
 
 function App() {
@@ -64,6 +65,10 @@ function App() {
 
                         {/* PROFILE SECTION */}
                         <Route path="profile" element={<Profile />} />
+
+                        {/* VIEW OTHER PROFILE */}
+                        <Route path="profile/:userID" element={<ViewProfile />} />
+
                         {/* APPLICATIONS */}
                         <Route path="profile/applications/active" element={<AdoptionApplications initialTab="Active" />} />
                         <Route path="profile/applications/accepted" element={<AdoptionApplications initialTab="Accepted" />} />

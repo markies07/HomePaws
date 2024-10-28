@@ -1,13 +1,39 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import banner from './assets/banner.png'
 import dogs from './assets/dogs.svg'
 import cats from './assets/cats.svg'
 import logo from './assets/orange-paws.png'
 import AnimalCard from '../General/AnimalCard'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../../firebase/firebase'
 
 function Content({ onLoginClick, open }) {
   
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        setLoading(true);
+        const fetchPets = async () => {
+
+          try{
+            const petsQuery = collection(db, "petsForAdoption");
+            const querySnapshot = await getDocs(petsQuery);
+            const petsList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setPets(petsList);
+          }
+          catch(error){
+            console.error(error);
+          }
+          finally{
+            setLoading(false);
+          }
+        }
+        fetchPets();
+    }, []);
 
   return (
     <div className='h-full'>
@@ -38,11 +64,11 @@ function Content({ onLoginClick, open }) {
       <div className='mt-52 flex justify-center flex-col items-center'>
         <h1 className='text-[#5D5D5D] inline-block font-semibold text-center text-3xl px-5'>Pets Available for Adoption
         </h1>
-        <div className='mt-10 mx-5 mb-40 gap-3 sm:gap-5 grid grid-cols-2 md:grid-cols-4'>
+        <div className={`${pets.length < 3 ? 'gap-3 sm:gap-5 grid grid-cols-2 sm:grid-cols-3' : 'gap-3 sm:gap-5 grid grid-cols-2 md:grid-cols-4'} mt-10 mx-5 mb-40`}>
           <AnimalCard onLoginClick={onLoginClick} />
           <div className='w-full max-w-48 relative m-auto items-center justify-between h-64 bg-primary flex flex-col drop-shadow-lg rounded-xl overflow-hidden'>
             <img className='w-32 pt-4' src={logo} alt="" />
-            <p className='text-white text-sm px-2 text-center'>3 more pets available on HomePaws</p>
+            <p className='text-white text-sm px-3 leading-4 text-center'>{`${pets.length <= 3 ? 'Pets' : `${pets.length - 3} more pets`} available on HomePaws`}</p>
             <p onClick={onLoginClick} className='text-white hover:bg-[#ff6c6c] duration-150 cursor-pointer font-medium w-full flex justify-center items-center border-t-[1px] border-white h-11'>MEET THEM</p>
           </div>
         </div>

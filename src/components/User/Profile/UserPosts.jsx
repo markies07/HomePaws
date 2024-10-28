@@ -78,6 +78,7 @@ function UserPosts() {
         }
     }, [posts, user.uid]);
 
+    // COMMENT INTERACTION
     const openComment = (postID) => {
         setIsCommentOpen(!isCommentOpen);
         setSelectedPost(postID)

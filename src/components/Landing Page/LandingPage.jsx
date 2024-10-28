@@ -4,7 +4,6 @@ import Content from './Content'
 import Footer from './Footer'
 import Login from './Login'
 import CreateAccount from './CreateAccount'
-import Cards from './Cards'
 import LoginForm from './LoginForm'
 import ForAdoption from './ForAdoption'
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,7 +30,7 @@ function LandingPage() {
   const isLogin = useSelector(state => state.ui.isLogin);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [petType, setPetType] = useState('dog');
+  const [petType, setPetType] = useState('');
 
   const openForAdoption = (type) => {
     setIsOpen(!isOpen);
@@ -45,7 +44,6 @@ function LandingPage() {
 
   return (
     <div className='relative min-h-screen flex flex-col select-none'>
-      < Cards />
       < ForAdoption petType={petType} isOpen={isOpen} closeUI={closeForAdoption} />
       < CreateAccount createOpen={isCreateOpen} createClose={() => dispatch(closeCreate())} />
       < LoginForm loginOpen={isLogin} loginClose={() => dispatch(closeIsLogin())} />

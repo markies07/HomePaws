@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
-import { addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
 import { useNavigate } from 'react-router-dom';
@@ -44,12 +44,19 @@ function CancelRehome({data, pet, closeCancel}) {
                 status: 'rejected',
             });
 
+            // Query and delete all notifications related to this applicationID
+            const notificationsRef = collection(db, 'notifications');
+            const notificationQuery = query(notificationsRef, where('applicationID', '==', data.applicationID));
+            const notificationSnapshots = await getDocs(notificationQuery);
+            const deletePromises = notificationSnapshots.docs.map((doc) => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+
             // NOTIFICATION
-            const notificationRef = collection(db, 'notifications');
-            await addDoc(notificationRef, {
+            
+            await addDoc(notificationsRef, {
                 content: `canceled rehoming ${pet.petName}.`,
                 applicationID: data.applicationID,
-                type: 'adoption',
+                type: 'rejected',
                 image: pet.petImages[0],
                 senderName: userData.fullName,
                 senderId: user.uid,
@@ -60,10 +67,11 @@ function CancelRehome({data, pet, closeCancel}) {
 
             // DELETING DOCUMENTS
             await deleteDoc(doc(db, "acceptedApplications", data.applicationID));
+            await deleteDoc(doc(db, "adoptionApplications", data.applicationID));
 
             notifySuccessOrange('Canceled successfully!');
             setTimeout(() => {
-                navigate('/dashboard/profile/applications/active')
+                navigate('/dashboard/profile')
             }, [2000]);
         }
         catch(error){

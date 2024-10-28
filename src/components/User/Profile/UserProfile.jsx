@@ -9,7 +9,6 @@ function UserProfile({openPetListed, openFavPets, openEdit}) {
     return (
         <div className='w-full my-3 lg:mt-3 relative px-3 lg:px-0'>
             <div className='rounded-md lg:rounded-lg w-full flex-col md:flex-row md:justify-between pb-3 md:py-5 pt-4 px-3 md:px-5 lg:px-7 gap-2 md:gap-5 flex justify-center items-center bg-secondary shadow-custom relative'>
-                {/* <img className='absolute cursor-pointer hover:bg-[#c7c7c7] duration-150 top-2 right-2 w-10 bg-[#D9D9D9] p-2 rounded-md' src={menu} alt="" /> */}
                 <div className='flex flex-col w-full justify-center items-center md:justify-start md:flex-row'>
                     <div className='w-24 h-24 md:my-auto sm:w-28 sm:h-28 shrink-0 bg-text mb-2 rounded-full relative'>
                         <img className='w-full h-full object-cover rounded-full' src={userData.profilePictureURL} alt="" />

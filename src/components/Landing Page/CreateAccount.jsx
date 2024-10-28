@@ -125,6 +125,9 @@ function CreateAccount({ createOpen, createClose }) {
                     await createUserDocument(user, pendingUserData);
                     notifySuccessWhite("Account created successfully.");
                     resetForm();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, [2000])
                 } else {
                     notifyInfoWhite("Email not verified yet. Please check your inbox.");
                     navigate('/dashboard');

@@ -8,12 +8,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { db } from '../../firebase/firebase';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import MeetupChecker from './MeetupChecker';
+import Search from './Search';
 
 function Dashboard() {
     const { user } = useContext(AuthContext);
     const [petOwnerTypeExists, setPetOwnerTypeExists] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchIsOpen, setSearchIsOpen] = useState(false);
 
     if (!user) {
         return <Navigate to="/" />; 
@@ -72,6 +74,10 @@ function Dashboard() {
         }
     }
 
+    const toggleSearch = () => {
+        setSearchIsOpen(!searchIsOpen);
+    }
+
 
 
     if(isLoading){
@@ -81,10 +87,15 @@ function Dashboard() {
 
     return (
         <div className='w-full min-h-screen bg-[#A1E4E4] select-none font-poppins text-text'>
-            <MeetupChecker />
-            <Header openLogout={handleLogoutClick} isOpen={isLogoutOpen} loading={setIsLoading}/>
-            {!petOwnerTypeExists ? <Question petOwnerType={handlePetOwnerType} /> : <Outlet />}
-            <NavBar />
+            <div className={`${searchIsOpen ? 'hidden' : 'block'}`}>
+                <MeetupChecker />
+                <Header openLogout={handleLogoutClick} searchOpen={toggleSearch} isOpen={isLogoutOpen} loading={setIsLoading}/>
+                {!petOwnerTypeExists ? <Question petOwnerType={handlePetOwnerType} /> : <Outlet />}
+                <NavBar />
+            </div>
+            <div className={`${searchIsOpen ? 'block' : 'hidden'}`}>
+                <Search searchClose={toggleSearch} />
+            </div>
         </div>
 
     )
