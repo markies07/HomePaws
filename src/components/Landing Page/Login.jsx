@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import close from './assets/close.svg'
 import logo from './assets/white-logo.png'
 import image from './assets/login-pic.jpg'
@@ -7,9 +7,11 @@ import { useNavigate } from 'react-router-dom'
 import { notifyErrorOrange, notifySuccessOrange } from '../General/CustomToast'
 import { auth, provider, signInWithPopup, db } from '../../firebase/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { AuthContext } from '../General/AuthProvider'
 
 
 function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
+    const {user, userData} = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleGoogleLogin = async () => {
@@ -35,12 +37,24 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
                     fullName,
                     email,
                     profilePictureURL,
+                    role: 'user'
                 });
             }
 
-            notifySuccessOrange('Login Successfully!');
-            console.log('User Info: ', user);
-            navigate('/dashboard');
+            const updatedUserSnapshot = await getDoc(userRef);
+            
+            const role = updatedUserSnapshot.data().role;
+
+            if(role) {
+                if (role === 'admin') {
+                    navigate('/admin/pet-management');
+                    notifySuccessOrange('Login Successfully!');
+                }
+                else if(role === 'user'){
+                    navigate('/dashboard/find-pet');
+                    notifySuccessOrange('Login Successfully!');
+                }  
+            }
 
         }
         catch (error) {
@@ -48,6 +62,8 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
             notifyErrorOrange("Failed to log in with Google.")
         }
     }
+
+    
 
      
     return (

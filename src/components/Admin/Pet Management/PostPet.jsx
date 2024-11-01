@@ -8,7 +8,6 @@ import { getDownloadURL, uploadBytes, ref } from 'firebase/storage'
 import { AuthContext } from '../../General/AuthProvider'
 
 function PostPet({closePostPet}) {
-
     const { user } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
@@ -129,9 +128,8 @@ function PostPet({closePostPet}) {
         }
     };
 
-
     return (
-        <div className='w-full h-full my-3 lg:my-4'>
+        <div className='w-full h-full mb-3 pl-3'>
             <div className='relative px-4 pb-5 bg-secondary lg:rounded-lg shadow-custom w-full h-full'>
                 <img onClick={closePostPet} className='absolute border-2 border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />
                 <p className='text-center font-medium text-3xl pt-12'>Post Pet for Adoption</p>

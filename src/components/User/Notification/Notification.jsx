@@ -9,6 +9,8 @@ import comment from './assets/comment-type.svg'
 import application from './assets/application.svg'
 import rehomed from './assets/rehomed.svg'
 import { useNavigate } from 'react-router-dom';
+import removed from './assets/removed.svg'
+import closed from './assets/closed.svg'
 
 function Notification() {
     const { user } = useContext(AuthContext);
@@ -123,7 +125,7 @@ function Notification() {
         setMarOpen(!marOpen);
     }
 
-    const readNotif = async (postID, notificationID, notifType, applicationID, accepted) => {
+    const readNotif = async (postID, notificationID, notifType, applicationID, accepted, petID) => {
         const notificationRef = doc(db, 'notifications', notificationID);
 
         await updateDoc(notificationRef, {
@@ -152,6 +154,9 @@ function Notification() {
         }
         else if(notifType === 'closed'){
             navigate(`/dashboard/profile/applications/closed/application/${applicationID}`, {state: {notifType}});
+        }
+        else if(notifType === 'removed'){
+            navigate(`/dashboard/find-pet/removed/${petID}`, {state: {notifType}});
         }
     }
 
@@ -182,11 +187,13 @@ function Notification() {
                             <div className="text-center text-gray-500 font-medium py-5 bg-[#E9E9E9] rounded-md">No Notification</div>
                         ) : (
                             displayedNotifications.map((notification) => (
-                                <div key={notification.id} onClick={() => readNotif(notification.postID, notification.id, notification.type, notification.applicationID, notification.accepted)} className='bg-[#E9E9E9] relative items-center flex hover:bg-[#d3d3d3] duration-150 cursor-pointer w-full p-3 rounded-lg'>
+                                <div key={notification.id} onClick={() => readNotif(notification.postID, notification.id, notification.type, notification.applicationID, notification.accepted, notification.petID)} className='bg-[#E9E9E9] relative items-center flex hover:bg-[#d3d3d3] duration-150 cursor-pointer w-full p-3 rounded-lg'>
                                     <div className='relative w-12 h-12 shrink-0'>
                                         <img className='w-full h-full object-cover rounded-full' src={notification.image} alt="" />
-                                        <img className={`${notification.type === 'rehome' ? 'hidden' : 'block'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={notification.type == 'like' ? like : notification.type == 'comment' ? comment : application} alt="" />
+                                        <img className={`${notification.type === 'like' || notification.type === 'comment' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={notification.type == 'like' ? like : notification.type == 'comment' ? comment : application} alt="" />
                                         <img className={`${notification.type === 'rehome' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={rehomed} alt="" />
+                                        <img className={`${notification.type === 'removed' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={removed} alt="" />
+                                        <img className={`${notification.type === 'closed' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={closed} alt="" />
                                     </div>
                                     <div className={`pl-3 sm:pl-4 flex flex-col justify-center ${notification.isRead ? 'pr-0' : 'pr-7'}`}>
                                         <p className='font-semibold text-sm sm:text-base leading-4'>{notification.senderName} <span className='font-normal'>{notification.content}</span></p>

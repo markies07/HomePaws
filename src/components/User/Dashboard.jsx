@@ -4,22 +4,30 @@ import Header from './Header'
 import Question from './Question';
 import LoadingScreen from '../General/LoadingScreen';
 import { AuthContext } from '../General/AuthProvider';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { db } from '../../firebase/firebase';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import MeetupChecker from './MeetupChecker';
 import Search from './Search';
 
 function Dashboard() {
-    const { user } = useContext(AuthContext);
+    const { user, userData, isRoleLoading } = useContext(AuthContext);
     const [petOwnerTypeExists, setPetOwnerTypeExists] = useState(false);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [searchIsOpen, setSearchIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     if (!user) {
         return <Navigate to="/" />; 
     }
+
+    // useEffect(() => {
+    //     if(userData?.role !== 'user'){
+    //         navigate('/admin/pet-management');
+    //     }
+    // }, [userData, navigate]);
+
 
     useEffect(() => {
         const fetchUserData = async () => {

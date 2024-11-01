@@ -13,12 +13,13 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isRoleLoading, setIsRoleLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        
             if (currentUser) {
 
-                
                 // Check if the email is verified
                 if (!currentUser.emailVerified) {
                     setUser(null); // Optionally set user to null if not verified
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }) => {
                     if(!userDataFromFirestore.profilePictureURL){
                         userDataFromFirestore.profilePictureURL = defaultProfile;
                     }
+                    
                     setUserData(userDataFromFirestore);
                 }
             } else {
@@ -41,17 +43,19 @@ export const AuthProvider = ({ children }) => {
                 setUserData(null);
             }
             setIsLoading(false);
+            setIsRoleLoading(false);
+           
         });
     
         return () => unsubscribe();
     }, []);
 
-    if (isLoading) {
+    if (isLoading || isRoleLoading) {
         return <LoadingScreen />;  // Display loading screen while checking auth status
     }
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, setIsLoading, userData }}>
+        <AuthContext.Provider value={{ user, isLoading, setIsLoading, userData, isRoleLoading }}>
             {children}
         </AuthContext.Provider>
     );

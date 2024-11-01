@@ -8,7 +8,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'fireb
 import { db } from '../../../firebase/firebase';
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
 import EditPet from './EditPet';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useImageModal } from '../../General/ImageModalContext';
 import FavoritePet from './FavoritePet';
 
@@ -18,6 +18,10 @@ function PetInfo() {
     const [isFaqsOpen, setIsFaqsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const path = location.pathname;
+    const col = path.includes('removed') ? 'removedPets' : 'petsForAdoption';
+
 
     
     const handleRemovePet = async (petID, petName) => {
@@ -54,7 +58,7 @@ function PetInfo() {
     useEffect(() => {
         const fetchPetData = async () => {
           try {
-            const petDocRef = doc(db, 'petsForAdoption', petID);  // Assume 'pets' is your collection
+            const petDocRef = doc(db, col, petID);  // Assume 'pets' is your collection
             const petDocSnap = await getDoc(petDocRef);
     
             if (petDocSnap.exists()) {
@@ -172,7 +176,7 @@ function PetInfo() {
                     </div> 
                     
                     {/* PET OWNER ACTIONS */}
-                    <div className={ user.uid === pet.userID ? 'w-[70%] sm:w-96 self-start lg:my-0 lg:rounded-lg shrink-0 lg:w-60 2xl:w-72 mx-auto bg-secondary mt-4 mb-7 text-text shadow-custom p-3 rounded-md' : 'hidden'}>
+                    <div className={ col === 'removedPets' ? 'hidden' : user.uid === pet.userID ? 'w-[70%] sm:w-96 self-start lg:my-0 lg:rounded-lg shrink-0 lg:w-60 2xl:w-72 mx-auto bg-secondary mt-4 mb-7 text-text shadow-custom p-3 rounded-md' : 'hidden'}>
                         <p className='text-xl font-medium pb-3'>Actions</p>
                         <div className='lg:w-full w-[90%] mx-auto'>
                             <button onClick={handleEditPetClick} className='w-full text-sm hover:bg-[#82ac35] duration-200 bg-[#8FBB3E] font-semibold text-white rounded-lg py-3 mb-2'>EDIT PET</button>
@@ -180,7 +184,15 @@ function PetInfo() {
                         </div>
                     </div> 
 
-                    <div onClick={() => navigate('/dashboard/find-pet')} className='w-40 hidden lg:flex cursor-pointer hover:bg-[#f0f0f0] duration-150 bg-secondary rounded-lg shadow-custom mt-3 py-2 justify-center items-center font-semibold'>
+                    {/* REASON OF REMOVAL */}
+                    <div className={ col === 'removedPets' ? 'w-[70%] sm:w-96 self-start lg:my-0 lg:rounded-lg shrink-0 lg:w-60 2xl:w-72 mx-auto bg-primary mt-4 mb-7 text-center text-white shadow-custom p-3 rounded-md' : 'hidden'}>
+                        <p className='text-xl font-medium pb-3'>Reason of removal</p>
+                        <div className='lg:w-full w-[90%] bg-secondary rounded-md p-2 text-start text-text mx-auto'>
+                            <p>{pet.reasonRemoved}</p>
+                        </div>
+                    </div> 
+
+                    <div onClick={() => col === 'petsForAdoption' ? navigate('/dashboard/find-pet') : navigate('/dashboard/notification')} className='w-40 hidden lg:flex cursor-pointer hover:bg-[#f0f0f0] duration-150 bg-secondary rounded-lg shadow-custom mt-3 py-2 justify-center items-center font-semibold'>
                         <img className='w-9 mr-3' src={back} alt="" />
                         <p>Go back</p>
                     </div>

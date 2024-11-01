@@ -18,10 +18,15 @@ import { Navigate } from 'react-router-dom'
 
 function LandingPage() {
 
-  const { user } = useContext(AuthContext);
+  const { user, userData } = useContext(AuthContext);
 
   if (user) {
-      return <Navigate to="/dashboard" />; // Redirect to the landing page if not logged in
+    if(userData?.role === 'admin'){
+      return <Navigate to="/admin/pet-management" />;
+    }
+    else{
+      return <Navigate to="/dashboard/find-pet" />; // Redirect to the landing page if not logged in
+    }
   }
 
   const dispatch = useDispatch();

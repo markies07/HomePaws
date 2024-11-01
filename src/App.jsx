@@ -1,9 +1,9 @@
-import React from "react"
+import React, { useContext } from "react"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
 import LandingPage from "./components/Landing Page/LandingPage"
 import Dashboard from "./components/User/Dashboard"
 import { ToastContainer } from "react-toastify"
-import { AuthProvider } from "./components/General/AuthProvider"
+import { AuthContext, AuthProvider } from "./components/General/AuthProvider"
 import PrivateRoute from "./components/General/PrivateRoute"
 import FindPet from "./components/User/Find Pet/FindPet"
 import NewsFeed from "./components/User/News Feed/NewsFeed"
@@ -24,9 +24,25 @@ import AdoptionApplications from "./components/User/Profile/AdoptionApplications
 import AcceptedApplication from "./components/User/Profile/AcceptedApplication"
 import RehomedPets from "./components/User/Profile/RehomedPets"
 import ViewProfile from "./components/User/Profile/View Profile/ViewProfile"
+// ADMIN IMPORTS
+import AdDashboard from "./components/Admin/Admin"
+import PetManagement from "./components/Admin/Pet Management/PetManagement"
+import AdPetInfo from "./components/Admin/Pet Management/PetInfo"
 
 
 function App() {
+  // Create a new component to handle the default redirect based on user role
+  const DefaultRedirect = () => {
+    const { userData } = useContext(AuthContext);
+    
+    // Redirect based on role
+    if (userData?.role === 'admin') {
+      return <Navigate replace to="/admin/pet-management" />;
+    }
+    else if(userData?.role === 'user'){
+      return <Navigate replace to="/dashboard/find-pet" />;
+    }
+  };
   
   return (
     <AuthProvider>
@@ -40,15 +56,28 @@ function App() {
                     {/* PUBLIC ROUTE */}
                     <Route path="/" element={<LandingPage />} />
 
-                    {/* PUBLIC ROUTE */}
+                    {/* DEFAULT REDIRECT ROUTE */}
+                    <Route path="/admin" element={<DefaultRedirect />} />
+
+                    {/* ADMIN ROUTE */}
+                    <Route element={<PrivateRoute />}>
+                      <Route path="/admin/*" element={<AdDashboard />} >
+
+                        {/* PET MANAGEMENT SECTION */}
+                        <Route path="pet-management" element={<PetManagement />} />
+                        <Route path="pet-management/:petID" element={<AdPetInfo />} />
+                      
+                      </Route>
+                    </Route>
+
+
+                    {/* USER ROUTE */}
                     <Route element={<PrivateRoute />}>
                       <Route path="/dashboard/*" element={<Dashboard />}>
-                        {/* DEFAULT ROUTE */}
-                        <Route path="" element={<Navigate replace to="find-pet" />} />
-
                         {/* FIND PET SECTION */}
                         <Route path="find-pet" element={<FindPet />} />
                         <Route path="find-pet/:petID" element={<PetInfo />} />
+                        <Route path="find-pet/removed/:petID" element={<PetInfo />} />
                         <Route path="find-pet/adoption/:petID" element={<AdoptionForm />} />
 
                         {/* NEWS FEED SECTION */}
@@ -82,9 +111,9 @@ function App() {
                         <Route path="profile/applications/application/:applicationID" element={<Application />} />
                         <Route path="profile/applications/closed/application/:applicationID" element={<Application />} />
                         <Route path="profile/applications/rejected/application/:applicationID" element={<Application />} />
-
                       </Route>
                     </Route>
+
                   </Routes>
                   <ToastContainer
                     position="top-right"
@@ -108,11 +137,3 @@ function App() {
 }
 
 export default App
-
-
-// GETTING LATEST CODE IN GITHUB
-// git pull origin main
-
-// DELOYING THE UPDATED VERSION OF HOMEPAWS IN FIREBASE
-// npm run build
-// firebase deploy

@@ -13,7 +13,9 @@ import comment from '../assets/comment.svg'
 import close from '../assets/small-close.svg'
 import settings from '../assets/settings.svg'
 import reportPost from '../assets/report.svg'
+import reportUser from '../assets/report-user.svg'
 import Report from '../../News Feed/Report';
+import ReportUser from './ReportUser';
 
 function ViewProfile() {
     const {userID} = useParams();
@@ -30,6 +32,7 @@ function ViewProfile() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const { showModal } = useImageModal();
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [isReportUser, setIsReportUser] = useState(false);
 
     // FETCHING USER DATA
     useEffect(() => {
@@ -169,6 +172,11 @@ function ViewProfile() {
         setIsSettingsOpen(null);
     }
 
+    const openReportUser = () => {
+        setIsReportUser(!isReportUser);
+    }
+    
+
     // MESSAGING EACH OTHER
     const handleStartChat = async (receiver) => {
 
@@ -220,14 +228,27 @@ function ViewProfile() {
                             </div>
                         </div>
 
-                        {/* MESSAGE USER MOBILE */}
-                        <div onClick={() => handleStartChat(userID)} className='bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer absolute top-0 right-0'>
-                            <img className='w-5 sm:w-7' src={message} alt="" />
+                        <div className='flex flex-col gap-2 absolute top-0 right-0'>
+                           {/* MESSAGE USER MOBILE */}
+                            <div onClick={() => handleStartChat(userID)} className='bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer '>
+                                <img className='w-5 sm:w-7' src={message} alt="" />
+                            </div> 
+                            {/* REPORT USER */}
+                            <div onClick={openReportUser} className='bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer '>
+                                <img className='w-5 sm:w-7' src={reportUser} alt="" />
+                            </div> 
                         </div>
+                        
                     </div>
 
-                    {/* MESSAGE USER */}
                     <div className='w-full hidden md:flex mt-2 md:mt-0 z-10 justify-center md:justify-end md:gap-3'>
+                        {/* REPORT USER */}
+                        <div onClick={openReportUser} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
+                            <img className='w-9 mt-1' src={reportUser} alt="" />
+                            <p className='font-medium text-center pt-2 text-xs'>Report User</p>
+                        </div>
+
+                        {/* MESSAGE USER */}
                         <div onClick={() => handleStartChat(userID)} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
                             <img className='w-9 mt-1' src={message} alt="" />
                             <p className='font-medium text-center pt-2 text-xs'>Message User</p>
@@ -324,6 +345,11 @@ function ViewProfile() {
                             )
                         })
                     )}
+                </div>
+
+                {/* REPORT USER */}
+                <div className={isReportUser ? 'block' : 'hidden'}>
+                    <ReportUser userID={userID} closeReport={openReportUser} />
                 </div>
             </div>
         </div>
