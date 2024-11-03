@@ -24,10 +24,14 @@ import AdoptionApplications from "./components/User/Profile/AdoptionApplications
 import AcceptedApplication from "./components/User/Profile/AcceptedApplication"
 import RehomedPets from "./components/User/Profile/RehomedPets"
 import ViewProfile from "./components/User/Profile/View Profile/ViewProfile"
+
 // ADMIN IMPORTS
 import AdDashboard from "./components/Admin/Admin"
 import PetManagement from "./components/Admin/Pet Management/PetManagement"
 import AdPetInfo from "./components/Admin/Pet Management/PetInfo"
+import RehomeInfo from "./components/Admin/Pet Management/RehomeInfo"
+import UserManagement from "./components/Admin/User Management/UserManagement"
+import UserProfile from "./components/Admin/User Management/UserProfile"
 
 
 function App() {
@@ -66,6 +70,11 @@ function App() {
                         {/* PET MANAGEMENT SECTION */}
                         <Route path="pet-management" element={<PetManagement />} />
                         <Route path="pet-management/:petID" element={<AdPetInfo />} />
+                        <Route path="pet-management/rehomed/:rehomedID" element={<RehomeInfo />} />
+
+                        {/* USER MANAGEMENT SECTION */}
+                        <Route path="user-management" element={<UserManagement />} />
+                        <Route path="user-management/profile/:userID" element={<UserProfile />} />
                       
                       </Route>
                     </Route>

@@ -90,7 +90,7 @@ function PetInfo() {
         <div className='pt-[8.75rem] lg:pt-[4.75rem] lg:pl-56 lg:ml-3 xl:pl-56 lg:pr-3 min-h-screen flex flex-col font-poppins text-text'>
             <div className='w-full flex flex-col lg:flex-row gap-3 h-full lg:pb-4 mt-4'>
                 <div className='relative px-4 pb-5 bg-secondary mx-auto sm:rounded-lg shadow-custom w-full sm:w-[90%] lg:w-full md:w-[80%] h-full'>
-                    <img onClick={() => navigate(`/dashboard/find-pet`)} className='absolute border-2 lg:hidden border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />
+                    <img onClick={() => navigate(`/admin/pet-management`)} className='absolute border-2 lg:hidden border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />
                     
                     {/* PICTURES */}
                     <div className='max-w-[38rem] pb-7 mx-auto flex pt-14 lg:pt-7 gap-3 sm:gap-5 xl:gap-7'>

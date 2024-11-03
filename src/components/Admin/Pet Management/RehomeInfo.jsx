@@ -1,22 +1,24 @@
 import React, { useContext, useEffect, useState } from 'react'
-import close from './assets/close.svg'
+import { useNavigate, useParams } from 'react-router-dom';
+import { AuthContext } from '../../General/AuthProvider';
+import { addDoc, collection, doc, getDoc, query, where } from 'firebase/firestore';
+import { db } from '../../../firebase/firebase';
+import Contract from '../../User/Profile/Contract';
+import LoadingScreen from '../../General/LoadingScreen';
+import close from './assets/close-dark.svg'
 import check from './assets/check.svg'
 import complete from './assets/complete.svg'
 import comment from './assets/white-comment.svg'
-import { useNavigate, useParams } from 'react-router-dom'
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { db } from '../../../firebase/firebase'
-import { AuthContext } from '../../General/AuthProvider'
-import Contract from './Contract'
-import LoadingScreen from '../../General/LoadingScreen'
+import schedule from './assets/schedule.svg'
 
-function RehomedPets() {
+function RehomeInfo() {
     const navigate = useNavigate();
     const {user, userData} = useContext(AuthContext);
     const {rehomedID} = useParams();
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
     const [profilePictureURL, setProfilePictureURL] = useState('');
+    const [scheduleOpen, setScheduleOpen] = useState(false);
 
     // FETCHING DATA FROM REHOMEDPETS
     useEffect(() => {
@@ -104,13 +106,31 @@ function RehomedPets() {
         <LoadingScreen />
     }
 
+    // CHANGING FORMAT OF DATE
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
 
-    console.log(data?.meetupSchedule?.meetupSchedule?.meetUpDate)
+    // CHANGING FORMAT OF TIME
+    function convertTo12Hour(time) {
+        if(data?.meetupSchedule?.meetUpTime){
+            let [hours, minutes] = time.split(':');
+            hours = parseInt(hours);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            return `${hours}:${minutes} ${ampm}`;
+        }
+    }
+
+    const toggleMeetup = () => {
+        setScheduleOpen(!scheduleOpen);
+    }
 
     return (
-        <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-48 xl:pl-[13.8rem] lg:pr-[13px] sm:px-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
+        <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-56 lg:ml-3 xl:pl-[13.8rem] lg:pr-[13px] sm:px-3 min-h-screen flex flex-col font-poppins text-text'>
             <div className='bg-secondary flex flex-col mb-3 pt-3 overflow-hidden flex-grow sm:pt-5 relative w-full shadow-custom h-full sm:rounded-md lg:rounded-lg'>
-                <img onClick={() => navigate('/dashboard/profile')} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
+                <img onClick={() => navigate('/admin/pet-management')} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
                 <p className='text-2xl text-center sm:text-start pt-6 px-3 sm:px-5 font-semibold sm:pt-0'>Rehomed Pet</p>
                 {/* PROGRESS BAR */}
                 <div className='relative sm:w-[90%] xl:w-[70%] sm:mx-auto mt-10 h-28 sm:h-auto px-5 flex justify-between'>
@@ -158,9 +178,12 @@ function RehomedPets() {
                             <p className='font-semibold'>Status:</p>
                             <p>Rehomed Completed!</p>
                         </div>
-                        {data?.meetupSchedule && 
-                            < Contract data={data} />
-                        }
+                        <div className='flex gap-2'>
+                            <button onClick={toggleMeetup} className={`flex bg-[#90b845] cursor-pointer duration-150 hover:bg-[#98c24a] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={schedule} alt="" />Meet-up Schedule</button>
+                            {data?.meetupSchedule && 
+                                < Contract data={data} />
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -202,10 +225,7 @@ function RehomedPets() {
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>
-                                <button onClick={() => handleStartChat(data.ownerUserID)} className={`${data?.adopterUserID === user.uid ? 'flex' : 'hidden'} bg-[#6AAAAA] leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Previous Owner</button>
-                                {/* {data.meetupSchedule && 
-                                    <AdoptionContract data={data} pet={pet} />
-                                } */}
+                                <button onClick={() => handleStartChat(data.ownerUserID)} className={` bg-[#6AAAAA] flex leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Previous Owner</button>
                             </div>
                         </div>
                     </div>
@@ -245,16 +265,41 @@ function RehomedPets() {
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>
-                                <button onClick={() => handleStartChat(data.adopterUserID)} className={`${data?.ownerUserID === user.uid ? 'flex' : 'hidden'} bg-[#6AAAAA] leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Adopter</button>
-                                {/* <button onClick={() => navigate(`/dashboard/profile/applications/application/${data.applicationID}`)} className='flex bg-[#6AAAAA] leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md'><img className='w-4 h-4' src={whiteApplication} alt="" />View Application</button> */}
+                                <button onClick={() => handleStartChat(data.adopterUserID)} className={` bg-[#6AAAAA] flex leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Adopter</button>
+                            </div>
+                        </div>
+                    </div>
+                 </div>   
+
+                 {/* MEET UP */}
+                 <div className={scheduleOpen ? 'block' : 'hidden'}>
+                    <div className='fixed inset-0 flex justify-center items-center z-50 bg-black/65'>
+                        <div className="relative px-5 bg-[#d8d8d8] w-[90%] sm:w-[30rem] h-auto rounded-lg py-5 flex flex-col">
+                            <img onClick={toggleMeetup} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
+                            <h1 className='text-center shrink-0 text-2xl font-semibold pt-5 sm:pt-0 mb-4'>Meet up Schedule</h1>
+                            
+                            <div className='mt-2'>
+                                <div className='flex gap-2'>
+                                    <div className='w-[65%] bg-secondary shadow-custom p-2 sm:p-3 rounded-md'>
+                                        <p className='font-semibold'>Date:</p>
+                                        <p>{formatDate(data?.meetupSchedule?.meetUpDate)}</p>
+                                    </div>
+                                    <div className='w-[35%] bg-secondary shadow-custom p-2 sm:p-3 rounded-md'>
+                                        <p className='font-semibold'>Time:</p>
+                                        <p>{convertTo12Hour(data?.meetupSchedule?.meetUpTime)}</p>
+                                    </div>
+                                </div>
+                                <div className='w-full mt-2 bg-secondary shadow-custom p-2 sm:p-3 rounded-md'>
+                                    <p className='font-semibold'>Place:</p>
+                                    <p>{data?.meetupSchedule?.meetUpPlace}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     )
 }
 
-export default RehomedPets
+export default RehomeInfo

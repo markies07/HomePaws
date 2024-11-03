@@ -76,7 +76,7 @@ function NewMessage({setIsNewMessage, closeUI}) {
                 {filteredUsers.map(user => (
 
                     <div key={user.id} onClick={() => handleStartChat(user.id)} className='bg-[#E9E9E9] relative w-full p-3 rounded-lg flex items-center hover:bg-[#d6d6d6] duration-150 cursor-pointer'>
-                        <img className='w-10 h-10 bg-text rounded-full' src={user.profilePictureURL} alt="" />
+                        <img className='w-10 h-10 bg-text rounded-full object-cover' src={user.profilePictureURL} alt="" />
                         <p className='font-medium pl-3 leading-4 w-52'>{user.fullName}</p>
                     </div>
                     

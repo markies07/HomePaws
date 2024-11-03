@@ -2,7 +2,7 @@ import React from 'react'
 import post from './assets/post.svg'
 import rehomed from './assets/rehomed.svg'
 
-function Options({openPostPet, changeFilter, selected}) {
+function Options({openPostPet, changeFilter, selected, openRehomed}) {
 
     return (
         <div className='relative px-2'>
@@ -21,7 +21,7 @@ function Options({openPostPet, changeFilter, selected}) {
                 </div>
                 {/* REHOMED PETS */}
                 <div className='bg-secondary shrink-0 px-2 sm:pr-4 py-1 gap-3 flex justify-center items-center rounded-lg shadow-custom'>
-                    <img src={rehomed} className='w-[40px] p-2 bg-[#E9E9E9] rounded-lg cursor-pointer hover:bg-[#dbdbdb] duration-150' alt="" />
+                    <img onClick={openRehomed} src={rehomed} className='w-[40px] p-2 bg-[#E9E9E9] rounded-lg cursor-pointer hover:bg-[#dbdbdb] duration-150' alt="" />
                     <p className='font-medium hidden sm:block'>Rehomed Pets</p>
                 </div>
             </div>
@@ -41,7 +41,7 @@ function Options({openPostPet, changeFilter, selected}) {
                 </div>
                 {/* REHOMED PETS */}
                 <div className='bg-secondary shrink-0 pl-3 pr-4 py-2 gap-3 flex justify-start items-center rounded-lg shadow-custom'>
-                    <img src={rehomed} className='w-[45px] p-2 bg-[#E9E9E9] rounded-lg cursor-pointer hover:bg-[#dbdbdb] duration-150' alt="" />
+                    <img onClick={openRehomed} src={rehomed} className='w-[45px] p-2 bg-[#E9E9E9] rounded-lg cursor-pointer hover:bg-[#dbdbdb] duration-150' alt="" />
                     <p className='font-medium pl-1 leading-5'>Rehomed Pets</p>
                 </div>
             </div>

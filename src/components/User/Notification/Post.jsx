@@ -153,7 +153,7 @@ function Post() {
 
 
   return (
-    <div className='pt-36 relative lg:pt-[4.75rem] lg:pl-48 xl:pl-56 lg:pr-3 lg:ml-4 flex flex-col font-poppins text-text'>
+    <div className='pt-36 relative lg:pt-[4.75rem] lg:pl-48 xl:pl-52 xl:ml-7 lg:pr-3 lg:ml-4 flex flex-col font-poppins text-text'>
       
       {post ? (
         <div className='flex flex-col mt-3 lg:mt-4 bg-secondary py-4 px-5 md:px-7 sm:mx-auto lg:mx-0 mb-3 w-full text-text sm:w-[97%] lg:w-full sm:rounded-md lg:rounded-lg shadow-custom'>
