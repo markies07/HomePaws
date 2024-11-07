@@ -320,7 +320,7 @@ function AcceptedApplication() {
 
                 {/* SCHEDULE */}
                 <div className={isScheduleOpen ? 'block' : 'hidden'}>
-                    <Schedule isMeetup={isMeetup} closeUI={toggleSchedule} data={data} pet={pet} />
+                    <Schedule adopter={adopter} isMeetup={isMeetup} closeUI={toggleSchedule} data={data} pet={pet} />
                 </div>
 
                 {/* CANCEL REHOME */}

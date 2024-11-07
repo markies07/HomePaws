@@ -4,16 +4,17 @@ import { AuthContext } from '../../General/AuthProvider';
 import { useLikesAndComments } from '../../General/LikesAndCommentsContext';
 import { useImageModal } from '../../General/ImageModalContext';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
-import application from './assets/application.svg'
-import petListed from './assets/petListed.svg'
-import favPets from './assets/favPets.svg'
 import { db } from '../../../firebase/firebase';
 import unlike from './assets/unlike.svg'
 import like from './assets/like.svg'
 import comment from './assets/comment.svg'
-import deletePost from './assets/delete.svg'
-import settings from './assets/settings.svg'
 import Comments from '../../User/News Feed/Comments';
+import Actions from './Actions';
+import BanUser from './BanUser';
+import DeactivateUser from './DeactivateUser';
+import admins from './assets/white-admins.svg'
+import message from './assets/message.svg';
+import actions from './assets/actions.svg';
 
 function UserProfile() {
     const {userID} = useParams();
@@ -22,6 +23,7 @@ function UserProfile() {
     const [loading, setLoading] = useState(false);
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
+    const [isActionOpen, setIsActionOpen] = useState(false);
 
     const [likedPosts, setLikedPosts] = useState({});
     const { handleLike, handleUnlike, handleComment } = useLikesAndComments();
@@ -82,8 +84,6 @@ function UserProfile() {
             fetchUserPosts();
         }
     }, [userID]);
-
-    console.log(userID)
 
     const toggleLike = (postID) => {
         const isLiked = likedPosts[postID];
@@ -208,31 +208,48 @@ function UserProfile() {
         navigate(`/dashboard/chat/convo/${chatID}`);
     }
 
+    const toggleAction = () => {
+        setIsActionOpen(!isActionOpen);
+    }
+
     return (
         <div className='pt-36 lg:pt-20 lg:pl-52 px-3 z-30 lg:pr-3 lg:ml-7 min-h-screen flex flex-col font-poppins text-text'>
             {/* USER PPROFILE */}
-            <div className='rounded-md mt-3 lg:rounded-lg w-full flex-col md:flex-row md:justify-between pb-3 md:py-5 p-4 md:px-5 lg:px-7 gap-2 md:gap-5 flex justify-center items-center bg-secondary shadow-custom relative'>
-                <div className='flex flex-col relative w-full justify-center items-center md:justify-start md:flex-row'>
-                    <div className='w-24 h-24 md:my-auto sm:w-28 sm:h-28 shrink-0 bg-text mb-2 rounded-full relative'>
+            <div className='rounded-md mt-3 lg:rounded-lg w-full flex-col md:flex-row md:justify-between pb-3 md:py-5 p-4 md:pl-5 lg:pl-7 md:pr-5 gap-2 md:gap-5 flex justify-center items-center bg-secondary shadow-custom relative'>
+                <p className={`${data.violationsCount >= 1 ? 'block' : 'hidden'} md:hidden sm:text-sm font-medium absolute text-xs top-2 left-2`}>Violation: {data.violationsCount}</p>
+                <div className={`flex flex-col relative w-full justify-center items-center md:justify-start md:flex-row`}>
+                    <div className={`w-24 h-24 md:my-auto sm:w-28 sm:h-28 shrink-0 bg-text mb-2 rounded-full relative`}>
                         <img className='w-full h-full object-cover rounded-full' src={data.profilePictureURL} alt="" />
                     </div>
                     <div className='flex flex-col md:items-start md:ml-5'>
                         <p className='font-medium text-xl text-center leading-3 mb-4 md:mb-1 md:text-2xl md:text-start'>{data.fullName}</p>
                         <div className='text-white text-xs flex justify-center gap-1 flex-wrap'>
+                            <p className={`${data.role === 'admin' ? 'block' : 'hidden'} text-xs bg-text rounded-full text-white px-2 py-1`}>admin</p>
                             <p className={`bg-primary py-1 px-3 rounded-full whitespace-nowrap ${data.petOwnerType !== 'Both' ? 'block' : 'hidden'}`}>{data.petOwnerType}</p>
                             <div className={data.petOwnerType === 'Both' ? 'flex gap-1' : 'hidden'}>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
                             </div>
                         </div>
+                        <p className={`${data.violationsCount >= 1 ? 'sm:block' : 'hidden'} hidden pt-2 text-center sm:text-sm text-xs `}>Violation: {data.violationsCount}</p>
                     </div>
                 </div>
 
-                {/* ACTIONS */}
-                <div className='flex md:flex-col sm:w-auto w-full gap-2 mt-2'>
-                    <button className='bg-[#D25A5A] hover:bg-[#bb4d4d] sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'>BAN <br className='sm:hidden' /> USER</button>
-                    <button className='bg-[#67B1B1] hover:bg-[#559b9b] sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'>DEACTIVATE <br className='sm:hidden' /> USER</button>
-                    <button className='bg-[#8FBB3E] hover:bg-[#7ea534] sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'>MESSAGE <br className='sm:hidden' /> USER</button>
+                {/* ACTIONS MOBILE */}
+                <div className='absolute md:hidden top-3 right-3 flex flex-col gap-2'>
+                    <button onClick={toggleAction} className=' bg-text rounded-md hover:bg-[#707070] duration-150'><img className='w-9 p-2' src={actions} alt="" /></button>
+                    <button className=' bg-[#8FBB3E] rounded-md hover:bg-[#7ea534] duration-150'><img className='w-9 p-2' src={message} alt="" /></button>
+                </div>
+
+                {/* ACTIONS DESKTOP */}
+                <div className='self-start hidden md:flex justify-end relative w-full gap-2 mt-2 md:mt-0'>
+                    <button className='bg-[#8FBB3E] flex hover:bg-[#7ea534] items-center gap-2 sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'> <img className='w-5' src={message} alt="" /> MESSAGE <br className='sm:hidden' /> USER</button>
+                    <button onClick={toggleAction} className=' bg-text rounded-md hover:bg-[#707070] duration-150'><img className='w-9 p-2' src={actions} alt="" /></button>
+                </div>
+
+                {/* ACTION WINDOW */}
+                <div className={isActionOpen ? 'absolute' : 'hidden'}>
+                    <Actions data={data} closeUI={toggleAction} />
                 </div>
             </div>
             {/* USER POSTS */}

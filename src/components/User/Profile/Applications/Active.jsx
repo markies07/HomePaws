@@ -128,7 +128,7 @@ function Active() {
         </div>
         <div className={`pl-3 flex flex-col justify-center`}>
           <p className={`${application.read === false && application.adopterUserID !== user.uid ? 'pr-7 sm:pr-10' : ''} font-semibold text-sm sm:text-base leading-4`}>
-            {isMyApplication ? 'Your' : (adopterName[application.adopterUserID])+'\'s'} <span className='font-normal'>submitted an adoption application for {application.petName}.</span>
+            {isMyApplication ? 'You' : (adopterName[application.adopterUserID])+'\'s'} <span className='font-normal'>submitted an adoption application for {application.petName}.</span>
           </p>
           <p className='text-xs sm:text-[13px] text-[#8a8a8a] mt-1 sm:mt-0'>{getTimeDifference(application.dateSubmitted)}</p>
         </div>

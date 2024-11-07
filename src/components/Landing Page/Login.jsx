@@ -5,13 +5,12 @@ import image from './assets/login-pic.jpg'
 import google from './assets/google.png'
 import { useNavigate } from 'react-router-dom'
 import { notifyErrorOrange, notifySuccessOrange } from '../General/CustomToast'
-import { auth, provider, signInWithPopup, db } from '../../firebase/firebase'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { AuthContext } from '../General/AuthProvider'
+import { auth, provider, signInWithPopup, db, signOut } from '../../firebase/firebase'
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore'
+import { errorAlert, successAlert } from '../General/CustomAlert'
 
 
 function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
-    const {user, userData} = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleGoogleLogin = async () => {
@@ -25,37 +24,88 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
             const email = user.email;
             const profilePictureURL = user.photoURL;
 
-            // Check if the user already exists in Firestore
-            const userRef = doc(db, 'users', uid);
-            const userSnapshot = await getDoc(userRef);
 
-            if (!userSnapshot.exists()) {
-                // If the user does not exist, create a new document in Firestore
-                await setDoc(userRef, {
-                    uid,
-                    createdAt: new Date(),
-                    fullName,
-                    email,
-                    profilePictureURL,
-                    role: 'user'
-                });
-            }
+            // CHECKING IF THE USER IS DEACTIVATED
+            const q = query(collection(db, 'deactivatedUsers'), where('userID', '==', user.uid));
+            const querySnapshot = await getDocs(q);
 
-            const updatedUserSnapshot = await getDoc(userRef);
-            
-            const role = updatedUserSnapshot.data().role;
+            if (!querySnapshot.empty) {
+                const deactivatedUserData = querySnapshot.docs[0].data();
+                let reactivationDate;
 
-            if(role) {
-                if (role === 'admin') {
-                    navigate('/admin/pet-management');
-                    notifySuccessOrange('Login Successfully!');
+                if (deactivatedUserData.reactivationDate instanceof Timestamp) {
+                    // If it's a Firestore Timestamp, use toDate()
+                    reactivationDate = deactivatedUserData.reactivationDate.toDate();
+                } else {
+                    // Otherwise, assume it's a string in "YYYY-MM-DD" format
+                    reactivationDate = new Date(deactivatedUserData.reactivationDate);
                 }
-                else if(role === 'user'){
-                    navigate('/dashboard/find-pet');
-                    notifySuccessOrange('Login Successfully!');
-                }  
+
+                const currentDate = new Date();
+
+                if (currentDate >= reactivationDate) {
+                    // Reactivate user by removing from deactivatedUsers
+                    successAlert('Your account has been reactivated. Please try to login again.')
+                    await deleteDoc(querySnapshot.docs[0].ref);
+                    return;
+
+                } 
+
+                if(currentDate != reactivationDate) {
+                    const formattedDate = reactivationDate.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                    });
+                    // User is still deactivated, sign out
+                    await signOut(auth);
+                    errorAlert(`Your account has been temporarily deactivated.`, ` Your access will be restored on ${formattedDate}.`);
+                    return;
+                }
             }
 
+
+            // CHECKING IF THE USER IS BANNED OR NOT
+            const bannedUserRef = query(collection(db, 'bannedUsers'), where('email', '==', email));
+            const bannedUserSnapshot = await getDocs(bannedUserRef);
+
+            if (!bannedUserSnapshot.empty) {
+                errorAlert("You are Banned!", "Your account has been banned due to multiple violations of our community guidelines.")
+                navigate('/');
+                return;
+            }
+            else{
+                // Check if the user already exists in Firestore
+                const userRef = doc(db, 'users', uid);
+                const userSnapshot = await getDoc(userRef);
+    
+                if (!userSnapshot.exists()) {
+                    // If the user does not exist, create a new document in Firestore
+                    await setDoc(userRef, {
+                        uid,
+                        createdAt: new Date(),
+                        fullName,
+                        email,
+                        profilePictureURL,
+                        role: 'user'
+                    });
+                }
+    
+                const updatedUserSnapshot = await getDoc(userRef);
+                
+                const role = updatedUserSnapshot.data().role;
+    
+                if(role) {
+                    if (role === 'admin') {
+                        navigate('/admin/pet-management');
+                        notifySuccessOrange('Login Successfully!');
+                    }
+                    else if(role === 'user'){
+                        navigate('/dashboard/find-pet');
+                        notifySuccessOrange('Login Successfully!');
+                    }  
+                }
+            }
         }
         catch (error) {
             console.error('Error during Google login:', error);

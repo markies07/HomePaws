@@ -11,6 +11,7 @@ import rehomed from './assets/rehomed.svg'
 import { useNavigate } from 'react-router-dom';
 import removed from './assets/removed.svg'
 import closed from './assets/closed.svg'
+import accepted from './assets/accepted.svg'
 
 function Notification() {
     const { user } = useContext(AuthContext);
@@ -193,7 +194,8 @@ function Notification() {
                                         <img className={`${notification.type === 'like' || notification.type === 'comment' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={notification.type == 'like' ? like : notification.type == 'comment' ? comment : application} alt="" />
                                         <img className={`${notification.type === 'rehome' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={rehomed} alt="" />
                                         <img className={`${notification.type === 'removed' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={removed} alt="" />
-                                        <img className={`${notification.type === 'closed' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={closed} alt="" />
+                                        <img className={`${notification.type === 'closed' || notification.type === 'rejected' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={closed} alt="" />
+                                        <img className={`${notification.type === 'adoption' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={application} alt="" />
                                     </div>
                                     <div className={`pl-3 sm:pl-4 flex flex-col justify-center ${notification.isRead ? 'pr-0' : 'pr-7'}`}>
                                         <p className='font-semibold text-sm sm:text-base leading-4'>{notification.senderName} <span className='font-normal'>{notification.content}</span></p>

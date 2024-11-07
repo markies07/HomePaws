@@ -8,7 +8,7 @@ import { notifyErrorOrange } from '../../General/CustomToast';
 import paw from './assets/white-paw.svg'
 import RehomedComplete from './RehomedComplete'
 
-function Schedule({closeUI, data, pet}) {
+function Schedule({closeUI, data, pet, adopter}) {
     const {user} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [meetUpDate, setMeetUpDate] = useState('');
@@ -164,7 +164,7 @@ function Schedule({closeUI, data, pet}) {
                         {/* BUTTONS */}
                         <div className='flex justify-center gap-2 pt-7'>
                             <button onClick={() => setIsScheduled(false)} className={`${data.status !== 'meetup' ? 'block' : 'hidden'} bg-[#D25A5A] hover:bg-[#c25454] cursor-pointer duration-150  font-medium gap-2 text-white py-1 px-4 rounded-md`}>RESCHEDULE</button>
-                            <RehomedComplete data={data} pet={pet} />
+                            <RehomedComplete adopter={adopter} data={data} pet={pet} />
                         </div>
                        
                     </div>

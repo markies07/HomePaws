@@ -13,6 +13,19 @@ export const confirm = (title, message) => {
     });
 };
 
+export const ban = (title, message) => {
+    return Swal.fire({
+        title: title,
+        html: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#82ac35',
+        cancelButtonColor: '#D25A5A',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    });
+};
+
 export const successAlert = (message) => {
     Swal.fire({
         title: 'Success!',
@@ -23,9 +36,9 @@ export const successAlert = (message) => {
     });
 };
 
-export const errorAlert = (message) => {
+export const errorAlert = (title, message) => {
     Swal.fire({
-        title: 'Error!',
+        title: title,
         text: message,
         icon: 'error',
         confirmButtonColor: '#D25A5A',

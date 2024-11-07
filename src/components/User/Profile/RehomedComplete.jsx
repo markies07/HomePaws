@@ -7,7 +7,7 @@ import { confirm, successAlert } from '../../General/CustomAlert';
 import { useNavigate } from 'react-router-dom';
 import rehomed from './assets/rehomed.png';
 
-function RehomedComplete({ data, pet }) {
+function RehomedComplete({ data, pet, adopter }) {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -27,6 +27,7 @@ function RehomedComplete({ data, pet }) {
                         meetupSchedule: data.meetupSchedule,
                         timestamp: serverTimestamp(),
                         adopterDetails: {
+                            profilePictureURL: adopter.profilePictureURL,
                             acceptedDate: data.acceptedDate,
                             adopterEmail: data.adopterEmail,
                             adopterName: data.adopterName,
