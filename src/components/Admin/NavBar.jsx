@@ -4,8 +4,6 @@ import findpet from './assets/findpet-icon.svg'
 import activefindpet from './assets/active-findpet.svg'
 import usersTab from './assets/users.svg'
 import activeaUsersTab from './assets/active-users.svg'
-import adoption from './assets/adoption.svg'
-import activeaAdoption from './assets/active-adoption.svg'
 import report from './assets/report.svg'
 import activeReport from './assets/active-report.svg'
 import chat from './assets/chat-icon.svg'
@@ -16,6 +14,8 @@ import profile from './assets/profile-icon.svg'
 import activeprofile from './assets/active-profile.svg'
 import notification from './assets/notification.svg'
 import activenotification from './assets/active-notification.svg'
+import stats from './assets/stats.svg'
+import activestats from './assets/active-stats.svg'
 
 function NavBar() {
     return (
@@ -37,10 +37,10 @@ function NavBar() {
                 )}
                 </NavLink>
 
-                {/* ADOPTION MANAGEMENT */}
-                <NavLink to="/admin/adoption-management" className={({ isActive }) => isActive ? 'py-2 relative bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
+                {/* ADOPTION STATISTICS */}
+                <NavLink to="/admin/adoption-stats" className={({ isActive }) => isActive ? 'py-2 relative bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
                 {({isActive}) => (
-                    <img className='w-8 h-7' src={isActive ? activeaAdoption : adoption} alt="Paw Icon" />
+                    <img className='w-8 h-7' src={isActive ? activestats : stats} alt="Paw Icon" />
                 )}
                 </NavLink>
 
@@ -104,11 +104,11 @@ function NavBar() {
                         )}
                     </NavLink>
 
-                    {/* ADOPTION MANAGEMENT */}
-                    <NavLink to="/admin/adoption-management" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
+                    {/* ADOPTION STATISTICS */}
+                    <NavLink to="/admin/adoption-stats" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
                         {({isActive}) => (
                         <div className='flex items-center relative'>
-                            <img className='pl-5 w-12' src={ isActive ? activeaAdoption : adoption} alt="" />
+                            <img className='pl-5 w-12' src={ isActive ? activestats : stats} alt="" />
                             <p className={isActive ? 'text-base text-white font-medium pl-4 leading-4' : 'text-base text-text font-medium leading-4 pl-4 '}>Adoption Management</p>
                         </div>
                         )}

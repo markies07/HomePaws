@@ -52,10 +52,11 @@ function CreatePost({closeWindow, postType}) {
             }
 
             // ADD POST TO FIRESTORE
-            const postRef = await addDoc(collection(db, 'userPosts'), {
+            await addDoc(collection(db, 'userPosts'), {
                 typeOfPost: postType,
                 caption: caption,
                 images: uploadedImageUrls,
+                isBanned: false,
                 userID: user.uid,
                 createdAt: serverTimestamp(),
                 userName:  userData?.fullName,

@@ -22,7 +22,8 @@ export const UserPostsProvider = ({ children }) => {
         try {
           if(!filterType || filterType === 'all') {
             postsQuery = query(
-              collection(db, 'userPosts'), // Use collection function for Firestore v9+
+              collection(db, 'userPosts'),
+              where('isBanned', '==', false),
               orderBy('createdAt', 'desc'),
               limit(10)
             );
@@ -31,6 +32,7 @@ export const UserPostsProvider = ({ children }) => {
             postsQuery = query(
               collection(db, 'userPosts'), 
               where('typeOfPost', '==', filterType),
+              where('isBanned', '==', false),
               orderBy('createdAt', 'desc'),
               limit(10)
             );

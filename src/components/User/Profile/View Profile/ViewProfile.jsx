@@ -349,7 +349,7 @@ function ViewProfile() {
 
                 {/* REPORT USER */}
                 <div className={isReportUser ? 'block' : 'hidden'}>
-                    <ReportUser userID={userID} closeReport={openReportUser} />
+                    <ReportUser data={data} userID={userID} closeReport={openReportUser} />
                 </div>
             </div>
         </div>

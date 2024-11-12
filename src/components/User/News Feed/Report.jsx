@@ -6,7 +6,7 @@ import { AuthContext } from '../../General/AuthProvider';
 import { db } from '../../../firebase/firebase';
 
 function Report({postID, closeReport}) {
-    const {user} = useContext(AuthContext);
+    const {user, userData} = useContext(AuthContext);
     const [selectedReason, setSelectedReason] = useState('');
     const [additionalDetails, setAdditionalDetails] = useState('');
     const [loading, setLoading] = useState(false);
@@ -24,16 +24,20 @@ function Report({postID, closeReport}) {
         }
 
         const reportData = {
-            userReport: user.uid,
+            reportedBy: user.uid,
+            reportedByName: userData.fullName,
+            profilePictureURL: userData.profilePictureURL,
             postID: postID,
+            read: false,
             reason: selectedReason,
             additionalDetails: additionalDetails,
-            timestamp: serverTimestamp(),
+            reportedAt: serverTimestamp(),
+            type: 'post',
             status: 'pending'
         };
 
         try{
-            await addDoc(collection(db, 'reportedPosts'), reportData);
+            await addDoc(collection(db, 'userReports'), reportData);
             notifySuccessOrange('Report submitted successfully!');
             closeReport();
         }

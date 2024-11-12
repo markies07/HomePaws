@@ -32,6 +32,9 @@ import AdPetInfo from "./components/Admin/Pet Management/PetInfo"
 import RehomeInfo from "./components/Admin/Pet Management/RehomeInfo"
 import UserManagement from "./components/Admin/User Management/UserManagement"
 import UserProfile from "./components/Admin/User Management/UserProfile"
+import ReportManagement from "./components/Admin/Report Management/ReportManagement"
+import Reason from "./components/Admin/Report Management/Reason"
+import Reported from "./components/User/Notification/Reported"
 
 
 function App() {
@@ -75,6 +78,12 @@ function App() {
                         {/* USER MANAGEMENT SECTION */}
                         <Route path="user-management" element={<UserManagement />} />
                         <Route path="user-management/profile/:userID" element={<UserProfile />} />
+
+
+                        {/* REPORT MANAGEMENT */}
+                        <Route path="report-management" element={<ReportManagement />} />
+                        <Route path="report-management/reason/user/:reportID" element={<Reason />} />
+                        <Route path="report-management/reason/post/:reportID" element={<Reason />} />
                       
                       </Route>
                     </Route>
@@ -95,6 +104,8 @@ function App() {
                         {/* NOTIFICATION SECTION */}
                         <Route path="notification" element={<Notification />} />
                         <Route path="notification/post/:postID" element={<Post />} />
+                        <Route path="notification/report/user/:reportID" element={<Reported />} />
+                        <Route path="notification/report/post/:reportID" element={<Reported />} />
 
                         {/* CHAT SECTION */}
                         <Route path="chat" element={<Chat />} >
