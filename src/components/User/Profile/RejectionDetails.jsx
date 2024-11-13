@@ -30,7 +30,6 @@ function RejectionDetails({applicationID, petName, closeIt}) {
         }
     }, [applicationID])
 
-    console.log(rejectedApp.canceledBy)
 
     return (
         <div className='fixed inset-0 flex justify-center items-center z-50 bg-black/60'>

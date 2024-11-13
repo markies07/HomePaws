@@ -207,7 +207,7 @@ function Post() {
                   <img className='w-[21px]' src={comment} alt="" />
                   <p className='font-semibold pl-1 sm:pl-2 text-sm'>Comment</p>
               </div>
-              <div className='flex items-center cursor-pointer'>
+              <div className='flex items-center opacity-60'>
                   <img className='w-5' src={message} alt="" />
                   <p className='font-semibold pl-1 sm:pl-2 text-sm'>Message</p>
               </div>

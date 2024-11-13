@@ -89,22 +89,26 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
                         profilePictureURL,
                         role: 'user'
                     });
+                    successAlert("Account created successfully!");
                 }
-    
-                const updatedUserSnapshot = await getDoc(userRef);
+                else{
+                    const updatedUserSnapshot = await getDoc(userRef);
                 
-                const role = updatedUserSnapshot.data().role;
-    
-                if(role) {
-                    if (role === 'admin') {
-                        navigate('/admin/pet-management');
-                        notifySuccessOrange('Login Successfully!');
+                    const role = updatedUserSnapshot.data().role;
+
+
+                    if(role) {
+                        if (role === 'admin') {
+                            navigate('/admin/pet-management');
+                            notifySuccessOrange('Login Successfully!');
+                        }
+                        else if(role === 'user'){
+                            navigate('/dashboard/find-pet');
+                            notifySuccessOrange('Login Successfully!');
+                        }  
                     }
-                    else if(role === 'user'){
-                        navigate('/dashboard/find-pet');
-                        notifySuccessOrange('Login Successfully!');
-                    }  
                 }
+    
             }
         }
         catch (error) {

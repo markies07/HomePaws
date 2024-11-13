@@ -128,6 +128,8 @@ function Reported() {
         }
       };
 
+      console.log(data)
+
 
     return (
         <div className='pt-36 relative lg:pt-20 lg:pl-52 xl:pl-56 xl:ml-3 lg:pr-3 min-h-screen flex flex-col font-poppins text-text'>
@@ -149,11 +151,18 @@ function Reported() {
                                 {/* ADMIN MESSAGE */}
                                 <div className='bg-[#E9E9E9] md:rounded-lg p-5 sm:p-7 w-full'>
                                     <p className='font-semibold mb-2'>Admin:</p>
-                                    <div className={`${data?.status === 'approved' ? 'block' : 'hidden'} bg-[#84B725] text-white shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col`}>
-                                        <p className='font-semibold'>"Thank you for reporting your concern. We have reviewed the report and taken action. The reported {isUser ? 'user has been penalized.' : 'user who posted that content has been penalized.'}"</p>
+                                    <div className={`${data?.reportedUser?.uid === user.uid ? 'hidden' : 'block'}`}>
+                                        <div className={`${data?.status === 'approved' ? 'block' : 'hidden'} bg-[#84B725] text-white shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col`}>
+                                            <p className='font-semibold'>"Thank you for reporting your concern. We have reviewed the report and taken action. The reported {isUser ? 'user has been penalized.' : 'user who posted that content has been penalized.'}"</p>
+                                        </div>
+                                        <div className={`${data?.status === 'declined' ? 'block' : 'hidden'} bg-[#D25A5A] text-white shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col`}>
+                                            <p className='font-semibold'>"Thank you for reporting your concern. We have reviewed the report but do not find sufficient grounds to take action at this time. Please let us know if you have any other issues to report."</p>
+                                        </div>
                                     </div>
-                                    <div className={`${data?.status === 'declined' ? 'block' : 'hidden'} bg-[#D25A5A] text-white shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col`}>
-                                        <p className='font-semibold'>"Thank you for reporting your concern. We have reviewed the report but do not find sufficient grounds to take action at this time. Please let us know if you have any other issues to report."</p>
+                                    <div className={`${data?.reportedUser?.uid === user.uid ? 'block' : 'hidden'}`}>
+                                        <div className={`bg-[#D25A5A] text-white shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col`}>
+                                            <p className='font-semibold'>"Your post has been removed due to: {data?.reason}. Please review our guidelines to ensure your future posts comply. If you have any questions or believe this was a mistake, feel free to contact our support team."</p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -209,7 +218,7 @@ function Reported() {
                                 </div>
 
                                 {/* REASON */}
-                                <div className='bg-[#E9E9E9] md:rounded-lg p-5 sm:p-7 w-full'>
+                                <div className={`${data?.reportedUser?.uid === user.uid ? 'hidden' : 'block'} bg-[#E9E9E9] md:rounded-lg p-5 sm:p-7 w-full`}>
                                     <p className='font-semibold mb-2'>Reason: </p>
                                     <div className='bg-secondary shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col'>
                                         <p className='font-semibold'>{data?.reason}</p>

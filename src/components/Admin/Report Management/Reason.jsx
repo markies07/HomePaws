@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, increment, query, serverTimestamp, updateDoc, where } from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { db } from '../../../firebase/firebase'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -100,6 +100,8 @@ function Reason() {
         }
     }, [reportID, isUser]);
 
+    console.log(data?.reportedUser?.uid)
+
     const getTimeDifference = (timestamp) => {
         if (!timestamp) return 'Invalid date';
         const now = new Date();
@@ -129,7 +131,7 @@ function Reason() {
         }
       };
     
-
+      
 
     // Function to handle approving or declining a report
     const handleReportAction = async (action) => {
@@ -181,6 +183,25 @@ function Reason() {
                     await updateDoc(postRef, {
                         isBanned: true,
                     });
+
+                    await addDoc(collection(db, 'notifications'), {
+                        userId: data?.reportedUser?.uid, 
+                        type: 'report',
+                        senderName: 'Admin:',
+                        senderID: user.uid,
+                        reportType: 'post',
+                        isRead: false,
+                        image: userData.profilePictureURL,
+                        content: 'Your post has been removed due to a violation of our guidelines.',
+                        timestamp: serverTimestamp(),
+                        reportID: reportID,
+                    })
+
+                    const userRef = doc(db, 'users', data?.reportedUser?.uid);
+                    await updateDoc(userRef, {
+                        violationsCount: increment(1)
+                    });
+
                     successAlert('Post removed successfully!');
                 }
                 catch(error){

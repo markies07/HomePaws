@@ -4,7 +4,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'fireb
 import { db } from '../../../firebase/firebase';
 import { useLikesAndComments } from '../../General/LikesAndCommentsContext';
 import { useImageModal } from '../../General/ImageModalContext';
-import Comments from '../News Feed/Comments';
+import Comments from './Comments';
 import unlike from './assets/unlike.svg'
 import like from './assets/like.svg'
 import comment from './assets/comment.svg'
@@ -32,7 +32,7 @@ function UserPosts() {
 
                 if(user){
                     const postsRef = collection(db, 'userPosts');
-                    const q = query(postsRef, where('userID', '==', user.uid));
+                    const q = query(postsRef, where('userID', '==', user.uid), where('isBanned', '==', false));
 
                     const querySnapshot = await getDocs(q);
                     const userPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

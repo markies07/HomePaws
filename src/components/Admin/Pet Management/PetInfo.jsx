@@ -2,13 +2,16 @@ import React, { useContext, useEffect, useState } from 'react'
 import close from '../../../assets/icons/close-dark.svg'
 import back from './assets/back.svg'
 import { AuthContext } from '../../General/AuthProvider';
-import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useImageModal } from '../../General/ImageModalContext';
 import pic from './assets/user.svg';
 import contact from './assets/contact.svg';
 import RemovePet from './RemovePet';
+import EditPet from './EditPet';
+import { confirm } from '../../General/CustomAlert';
+import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
 
 function PetInfo() {
     const { user } = useContext(AuthContext);
@@ -17,14 +20,13 @@ function PetInfo() {
     const [removePetOpen, setRemovePetOpen] = useState(false);
     const navigate = useNavigate();
     const path = location.pathname;
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const col = path.includes('removed') ? 'removedPets' : 'petsForAdoption';
 
 
     const { petID } = useParams();
     const [pet, setPet] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    console.log(col);
 
     useEffect(() => {
         const fetchPetData = async () => {
@@ -67,7 +69,6 @@ function PetInfo() {
                     // Execute the query
                     const querySnapshot = await getDocs(q);
                     
-                    console.log(querySnapshot)
                 } catch (error) {
                     console.error("Error checking application status: ", error);
                 }
@@ -77,8 +78,62 @@ function PetInfo() {
         }
     }, [user, petID]);
 
+
+    const handleRemovePet = async (petID, petName) => {
+        confirm(`Removing ${pet.petName}`, `Do you really want to remove ${pet.petName} from adoption?`).then(async (result) => {
+            if(result.isConfirmed){
+                try{
+                    await deleteDoc(doc(db, 'petsForAdoption', petID));
+                    notifySuccessOrange(`${petName} has been removed from adoption.`);
+                    setTimeout(() => {
+                        navigate(`/admin/pet-management`);
+                    }, 1000);
+                }
+                catch(error){
+                    console.error("Error removing pet: ", error);
+                    notifyErrorOrange('There was an issue removing the pet.');
+                }
+            }
+        })
+    }
+
+    // MESSAGING EACH OTHER
+    const handleStartChat = async (receiver) => {
+
+        const q = query(
+            collection(db, 'chats'),
+            where('participants', 'array-contains', receiver && user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        let existingChat = null;
+
+        querySnapshot.forEach(doc => {
+            const participants = doc.data().participants;
+            if(participants.includes(receiver)) {
+                existingChat = doc.id;
+            }
+        });
+
+        let chatID;
+        if(existingChat){
+            chatID = existingChat;
+        }
+        else{
+            const newChatRef = await addDoc(collection(db, 'chats'), {
+                participants: [user.uid, receiver],
+            })
+            chatID = newChatRef.id;
+        }
+        navigate(`/admin/chat/convo/${chatID}`);
+    }
+
     const toggleRemovePet = () => {
         setRemovePetOpen(!removePetOpen);
+    }
+
+    const handleEditPetClick = () => {
+        setIsEditOpen(!isEditOpen);
     }
 
     if (loading) {
@@ -88,7 +143,7 @@ function PetInfo() {
 
     return (
         <div className='pt-[8.75rem] lg:pt-[4.75rem] lg:pl-56 lg:ml-3 xl:pl-56 lg:pr-3 min-h-screen flex flex-col font-poppins text-text'>
-            <div className='w-full flex flex-col lg:flex-row gap-3 h-full lg:pb-4 mt-4'>
+            <div className={ !isEditOpen ? 'w-full flex flex-col lg:flex-row gap-3 h-full lg:pb-4 mt-4' : 'hidden'}>
                 <div className='relative px-4 pb-5 bg-secondary mx-auto sm:rounded-lg shadow-custom w-full sm:w-[90%] lg:w-full md:w-[80%] h-full'>
                     <img onClick={() => navigate(`/admin/pet-management`)} className='absolute border-2 lg:hidden border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />
                     
@@ -148,10 +203,19 @@ function PetInfo() {
                         <div className='w-full my-3 mb-4'>
                             <div className='h-[1px] w-full relative bg-[#a1a1a1]'></div>
                         </div>
-                        <div className='flex flex-col gap-2'>
-                            <button className='bg-[#8FBB3E] text-sm w-full py-2 text-white rounded-md hover:bg-[#82aa38] duration-150 font-medium'>Message Owner</button>
+
+                        {/* OTHER USERS */}
+                        <div className={`${pet.userID === user.uid ? 'hidden' : 'flex'} flex-col gap-2`}>
+                            <button onClick={() => handleStartChat(pet.userID)} className='bg-[#8FBB3E] text-sm w-full py-2 text-white rounded-md hover:bg-[#82aa38] duration-150 font-medium'>Message Owner</button>
                             <button onClick={toggleRemovePet} className='bg-primary text-sm w-full py-2 text-white rounded-md hover:bg-[#e44d1f] duration-150 font-medium'>Remove Pet</button>
                         </div>
+
+                        {/* PET OWNER */}
+                        <div className={`${pet.userID === user.uid ? 'flex' : 'hidden'} flex-col gap-2`}>
+                            <button onClick={handleEditPetClick} className='bg-[#8FBB3E] text-sm w-full py-2 text-white rounded-md hover:bg-[#82aa38] duration-150 font-medium'>Edit Pet</button>
+                            <button onClick={() => handleRemovePet(pet.petID, pet.petName)} className='bg-primary text-sm w-full py-2 text-white rounded-md hover:bg-[#e44d1f] duration-150 font-medium'>Remove Pet</button>
+                        </div>
+
                     </div> 
                     
 
@@ -161,6 +225,13 @@ function PetInfo() {
                     </div>
                 </div>
             </div>
+
+            {/* EDIT PET */}
+            <div className={isEditOpen ? 'block' : 'hidden'}>
+                <EditPet pet={pet} closeEdit={handleEditPetClick} />
+            </div>
+
+            {/* REMOVING PET */}
             <div className={removePetOpen ? 'block' : 'hidden'}>
                 <RemovePet petName={pet.petName} pet={pet} closeUI={toggleRemovePet} />
             </div>

@@ -35,6 +35,18 @@ import UserProfile from "./components/Admin/User Management/UserProfile"
 import ReportManagement from "./components/Admin/Report Management/ReportManagement"
 import Reason from "./components/Admin/Report Management/Reason"
 import Reported from "./components/User/Notification/Reported"
+import AdoptionStatistics from "./components/Admin/Adoption Statistics/AdoptionStatistics"
+import AdNotification from "./components/Admin/Notification/Notification"
+import AdPost from "./components/Admin/Notification/Post"
+import AdChat from "./components/Admin/Chat/Chat"
+import AdConversation from "./components/Admin/Chat/Conversation"
+import AdProfile from "./components/Admin/Profile/Profile"
+import AdAdoptionApplications from "./components/Admin/Profile/AdoptionApplications"
+import AdAcceptedApplication from "./components/Admin/Profile/AcceptedApplication"
+import AdApplication from "./components/Admin/Profile/Application"
+import AdRehomedPets from "./components/Admin/Profile/RehomedPets"
+import AdNewsFeed from "./components/Admin/News Feed/NewsFeed"
+import AdViewProfile from "./components/Admin/Profile/View Profile/ViewProfile"
 
 
 function App() {
@@ -79,11 +91,47 @@ function App() {
                         <Route path="user-management" element={<UserManagement />} />
                         <Route path="user-management/profile/:userID" element={<UserProfile />} />
 
+                        {/* ADOPTION STATISTICS */}
+                        <Route path="adoption-stats" element={<AdoptionStatistics />} />
 
                         {/* REPORT MANAGEMENT */}
                         <Route path="report-management" element={<ReportManagement />} />
                         <Route path="report-management/reason/user/:reportID" element={<Reason />} />
                         <Route path="report-management/reason/post/:reportID" element={<Reason />} />
+
+
+                        {/* NOTIFICATIONS */}
+                        <Route path="notification" element={<AdNotification />} />
+                        <Route path="notification/post/:postID" element={<AdPost />} />
+
+                        {/* NEWS FEED */}
+                        <Route path="news-feed" element={<AdNewsFeed />} />
+
+                        {/* CHAT */}
+                        <Route path="chat" element={<AdChat />} >
+                          <Route path="convo/:chatID" element={<AdConversation />} />
+                        </Route>
+
+                        {/* PROFILE */}
+                        <Route path="profile" element={<AdProfile />} />
+
+                        {/* VIEW OTHER PROFILE */}
+                        <Route path="profile/:userID" element={<AdViewProfile />} />
+
+                        <Route path="profile/applications/active" element={<AdAdoptionApplications initialTab="Active" />} />
+                        <Route path="profile/applications/accepted" element={<AdAdoptionApplications initialTab="Accepted" />} />
+                        <Route path="profile/applications/rejected" element={<AdAdoptionApplications initialTab="Rejected" />} />
+                        <Route path="profile/applications/closed" element={<AdAdoptionApplications initialTab="Closed" />} />
+                        <Route path="profile/applications/rehomed" element={<AdAdoptionApplications initialTab="Rehomed" />} />
+
+                        {/* APPLICATIONS */}
+                        <Route path="profile/applications/accepted/:applicationID" element={<AdAcceptedApplication />} />
+                        <Route path="profile/applications/rehomed/:rehomedID" element={<AdRehomedPets />} />
+                        <Route path="profile/applications/active/application/:applicationID" element={<AdApplication />} />
+                        <Route path="profile/applications/application/:applicationID" element={<AdApplication />} />
+                        <Route path="profile/applications/closed/application/:applicationID" element={<AdApplication />} />
+                        <Route path="profile/applications/rejected/application/:applicationID" element={<AdApplication />} />
+
                       
                       </Route>
                     </Route>

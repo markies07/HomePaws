@@ -16,7 +16,7 @@ function UserProfile({openPetListed, openFavPets, openEdit}) {
                     </div>
                     <div className='flex flex-col md:items-start md:ml-5 lg:ml-7'>
                         <p className='font-medium text-xl text-center leading-3 mb-4 md:mb-1 md:text-2xl md:text-start'>{userData.fullName}</p>
-                        <div className='text-white text-xs flex justify-center gap-1 flex-wrap'>
+                        <div className='text-white text-xs flex justify-center md:justify-start gap-1 flex-wrap'>
                             <p className={`bg-primary py-1 px-3 rounded-full whitespace-nowrap ${userData.petOwnerType !== 'Both' ? 'block' : 'hidden'}`}>{userData.petOwnerType}</p>
                             <div className={userData.petOwnerType === 'Both' ? 'flex gap-1' : 'hidden'}>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>

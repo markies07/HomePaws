@@ -134,6 +134,8 @@ function Application() {
     } 
 
     const image = petData.petImages && petData.petImages.length > 0 ? petData.petImages[0] : null;
+
+    console.log(image)
    
 
     return (

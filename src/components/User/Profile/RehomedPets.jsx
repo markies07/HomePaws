@@ -4,7 +4,7 @@ import check from './assets/check.svg'
 import complete from './assets/complete.svg'
 import comment from './assets/white-comment.svg'
 import { useNavigate, useParams } from 'react-router-dom'
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../../firebase/firebase'
 import { AuthContext } from '../../General/AuthProvider'
 import Contract from './Contract'
@@ -104,13 +104,10 @@ function RehomedPets() {
         <LoadingScreen />
     }
 
-
-    console.log(data?.meetupSchedule?.meetupSchedule?.meetUpDate)
-
     return (
         <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-48 xl:pl-[13.8rem] lg:pr-[13px] sm:px-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
             <div className='bg-secondary flex flex-col mb-3 pt-3 overflow-hidden flex-grow sm:pt-5 relative w-full shadow-custom h-full sm:rounded-md lg:rounded-lg'>
-                <img onClick={() => navigate('/dashboard/profile')} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
+                <img onClick={() => () => window.history.back()} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
                 <p className='text-2xl text-center sm:text-start pt-6 px-3 sm:px-5 font-semibold sm:pt-0'>Rehomed Pet</p>
                 {/* PROGRESS BAR */}
                 <div className='relative sm:w-[90%] xl:w-[70%] sm:mx-auto mt-10 h-28 sm:h-auto px-5 flex justify-between'>

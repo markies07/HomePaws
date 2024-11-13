@@ -116,7 +116,7 @@ function Schedule({closeUI, data, pet, adopter}) {
                         <div className='w-full flex gap-2'>
                             <div className='w-[50%]'>
                                 <p className='font-semibold'>Date</p>
-                                <input required onChange={(e) => setMeetUpDate(e.target.value)} className='py-[3px] text-sm sm:text-base bg-secondary w-full px-2 border-2 outline-none border-text rounded-md' type="date" />
+                                <input required onChange={(e) => setMeetUpDate(e.target.value)} min={new Date(new Date().setDate(new Date().getDate())).toISOString().split("T")[0]} className='py-[3px] text-sm sm:text-base bg-secondary w-full px-2 border-2 outline-none border-text rounded-md' type="date" />
                             </div>
                             <div className='w-[50%]'>
                                 <p className='font-semibold'>Time</p>
@@ -176,7 +176,7 @@ function Schedule({closeUI, data, pet, adopter}) {
                         <div className='w-full flex gap-2'>
                             <div className='w-[50%]'>
                                 <p className='font-semibold'>Date</p>
-                                <input required onChange={(e) => setMeetUpDate(e.target.value)} value={meetUpDate} className='py-[3px] text-sm sm:text-base bg-secondary w-full px-2 border-2 outline-none border-text rounded-md' type="date" />
+                                <input required onChange={(e) => setMeetUpDate(e.target.value)} min={new Date(new Date().setDate(new Date().getDate())).toISOString().split("T")[0]} value={meetUpDate} className='py-[3px] text-sm sm:text-base bg-secondary w-full px-2 border-2 outline-none border-text rounded-md' type="date" />
                             </div>
                             <div className='w-[50%]'>
                                 <p className='font-semibold'>Time</p>

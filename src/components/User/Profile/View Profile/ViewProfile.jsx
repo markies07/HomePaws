@@ -6,7 +6,7 @@ import message from '../assets/message.svg';
 import { AuthContext } from '../../../General/AuthProvider';
 import { useImageModal } from '../../../General/ImageModalContext';
 import { useLikesAndComments } from '../../../General/LikesAndCommentsContext';
-import Comments from '../../News Feed/Comments';
+import Comments from '../Comments';
 import unlike from '../assets/unlike.svg'
 import like from '../assets/like.svg'
 import comment from '../assets/comment.svg'
@@ -65,7 +65,7 @@ function ViewProfile() {
                 setLoading(true);
 
                 const postsRef = collection(db, 'userPosts');
-                const q = query(postsRef, where('userID', '==', userID));
+                const q = query(postsRef, where('userID', '==', userID), where('isBanned', '==', false));
 
                 const querySnapshot = await getDocs(q);
                 const userPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -219,12 +219,13 @@ function ViewProfile() {
                         </div>
                         <div className='flex flex-col md:items-start md:ml-5'>
                             <p className='font-medium text-xl text-center leading-3 mb-4 md:mb-1 md:text-2xl md:text-start'>{data.fullName}</p>
-                            <div className='text-white text-xs flex justify-center gap-1 flex-wrap'>
+                            <div className='text-white text-xs flex justify-center md:justify-start gap-1 flex-wrap'>
                                 <p className={`bg-primary py-1 px-3 rounded-full whitespace-nowrap ${data.petOwnerType !== 'Both' ? 'block' : 'hidden'}`}>{data.petOwnerType}</p>
                                 <div className={data.petOwnerType === 'Both' ? 'flex gap-1' : 'hidden'}>
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
                                 </div>
+                                <p className={`${data.role === 'admin' ? 'block' : 'hidden'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Admin</p>
                             </div>
                         </div>
 
@@ -241,7 +242,7 @@ function ViewProfile() {
                         
                     </div>
 
-                    <div className='w-full hidden md:flex mt-2 md:mt-0 z-10 justify-center md:justify-end md:gap-3'>
+                    <div className='w-1/2 hidden md:flex mt-2 md:mt-0 z-10 justify-center md:justify-end md:gap-3'>
                         {/* REPORT USER */}
                         <div onClick={openReportUser} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
                             <img className='w-9 mt-1' src={reportUser} alt="" />

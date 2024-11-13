@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import findpet from './assets/findpet-icon.svg'
 import activefindpet from './assets/active-findpet.svg'
@@ -16,8 +16,63 @@ import notification from './assets/notification.svg'
 import activenotification from './assets/active-notification.svg'
 import stats from './assets/stats.svg'
 import activestats from './assets/active-stats.svg'
+import { AuthContext } from '../General/AuthProvider'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '../../firebase/firebase'
 
 function NavBar() {
+    const {user} = useContext(AuthContext);
+    const [hasUnseenNotif, setHasUnseenNotif] = useState(false);
+    const [hasUnseenMess, setHasUnseenMess] = useState(false);
+  
+    const fetchUnseenNotif = async () => {
+      const notificationRef = collection(db, 'notifications');
+      const q = query(notificationRef, where('userId', '==', user.uid), where('isRead', '==', false));
+  
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    }
+  
+    const fetchUnseenMess = async () => {
+      const chatQuery = query(
+        collection(db, 'chats'),
+        where('participants', 'array-contains', user.uid)
+      );
+    
+      const chatSnapshot = await getDocs(chatQuery);
+      let hasUnseenMessages = false;
+  
+      for(const chatDoc of chatSnapshot.docs){
+        const messagesRef = collection(db, `chats/${chatDoc.id}/messages_${user.uid}`);
+        const unseenMessagesQuery = query(messagesRef, where('read', '==', false));
+  
+        const unseenMessagesSnapshot = await getDocs(unseenMessagesQuery);
+  
+        if(!unseenMessagesSnapshot.empty){
+          hasUnseenMessages = true;
+          break;
+        }
+      }
+      return hasUnseenMessages;
+    }
+  
+  
+    useEffect(() => {
+      const getNotifStatus = async () => {
+        const unseen = await fetchUnseenNotif();
+        setHasUnseenNotif(unseen);
+      }
+  
+      const getMessStatus = async () => {
+        const unread = await fetchUnseenMess();
+        setHasUnseenMess(unread);
+      }
+  
+      getMessStatus();
+      getNotifStatus();
+    }, [user.uid]);
+
+
     return (
         <>
             {/* MOBILE VIEW */}
@@ -51,13 +106,6 @@ function NavBar() {
                 )}
                 </NavLink>
 
-                {/* NOTIFICATION */}
-                <NavLink to="/admin/notification" className={({ isActive }) => isActive ? 'py-2 relative bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
-                {({isActive}) => (
-                    <img className='w-8 h-7' src={isActive ? activenotification : notification} alt="Paw Icon" />
-                )}
-                </NavLink>
-
                 {/* NEWS FEED */}
                 <NavLink to="/admin/news-feed" className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
                 {({isActive}) => (
@@ -65,10 +113,29 @@ function NavBar() {
                 )}
                 </NavLink>
 
-                {/* CHAT */}
-                <NavLink to="/admin/chat" className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
+                {/* NOTIFICATION */}
+                <NavLink to="/admin/notification" onClick={() => setHasUnseenNotif(false)} className={({ isActive }) => isActive ? 'py-2 relative bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
                 {({isActive}) => (
-                    <img className='w-9 h-7' src={isActive ? activechat : chat} alt="Paw Icon" />
+                    <div className='relative'>
+                        <img className='w-8 h-7' src={isActive ? activenotification : notification} alt="Paw Icon" />
+                        {/* NOTIFICATION */}
+                        {hasUnseenNotif && (
+                            <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary -right-1 -top-1'/>
+                        )}
+                    </div>
+                )}
+                </NavLink>
+
+                {/* CHAT */}
+                <NavLink to="/admin/chat" onClick={() => setHasUnseenMess(false)} className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
+                {({isActive}) => (
+                    <div className='relative'>
+                        <img className='w-9 h-7' src={isActive ? activechat : chat} alt="Paw Icon" />
+                        {/* NOTIFICATION */}
+                        {hasUnseenMess && (
+                            <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary -right-2 -top-2'/>
+                        )}
+                    </div>
                 )}
                 </NavLink>
 
@@ -124,16 +191,6 @@ function NavBar() {
                         )}
                     </NavLink>
 
-                    {/* NOTIFICATION */}
-                    <NavLink to="/admin/notification" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
-                        {({isActive}) => (
-                        <div className='flex items-center relative'>
-                            <img className='pl-[19px] w-[47px]' src={ isActive ? activenotification : notification} alt="" />
-                            <p className={isActive ? 'text-base text-white font-medium pl-[17px] leading-4' : 'text-base text-text font-medium leading-4 pl-[17px]'}>Notification</p>
-                        </div>
-                        )}
-                    </NavLink>
-
                     {/* NEWS FEED */}
                     <NavLink to="/admin/news-feed" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
                         {({isActive}) => (
@@ -144,12 +201,30 @@ function NavBar() {
                         )}
                     </NavLink>
 
+                    {/* NOTIFICATION */}
+                    <NavLink to="/admin/notification" onClick={() => setHasUnseenNotif(false)} className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
+                        {({isActive}) => (
+                        <div className='flex items-center relative'>
+                            <img className='pl-[19px] w-[47px]' src={ isActive ? activenotification : notification} alt="" />
+                            <p className={isActive ? 'text-base text-white font-medium pl-[17px] leading-4' : 'text-base text-text font-medium leading-4 pl-[17px]'}>Notification</p>
+                            {/* NOTIFICATION */}
+                            {hasUnseenNotif && (
+                                <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary left-10 top-2'/>
+                            )}
+                        </div>
+                        )}
+                    </NavLink>
+
                     {/* CHAT */}
-                    <NavLink to="/admin/chat" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
+                    <NavLink to="/admin/chat" onClick={() => setHasUnseenMess(false)} className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
                         {({isActive}) => (
                         <div className='flex items-center relative'>
                             <img className='pl-[19px] w-12' src={ isActive ? activechat : chat} alt="" />
                             <p className={isActive ? 'text-base text-white font-medium leading-4 pl-4' : 'text-base text-text leading-4 font-medium pl-4'}>Chat</p>
+                            {/* NOTIFICATION */}
+                            {hasUnseenMess && (
+                                <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary left-10 top-2'/>
+                            )}
                         </div>
                         )}
                     </NavLink>
