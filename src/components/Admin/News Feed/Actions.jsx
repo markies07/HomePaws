@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import story from './assets/story.svg'
-import missing from './assets/missing.svg'
+import announcement from './assets/announcement.svg'
 import found from './assets/found.svg'
 import { useUserPosts } from '../../General/UserPostsContext'
 
@@ -25,7 +25,7 @@ function Actions({open}) {
                     <p className='font-medium pb-1 lg:text-lg'>Create a post</p>
                     <div className='flex gap-2 sm:gap-3 lg:gap-4 lg:px-2 lg:pb-1'>
                         <img onClick={() => open('story')} className='w-10 sm:w-12 p-2 cursor-pointer hover:bg-[#d8d8d8] duration-150 rounded-md bg-[#E9E9E9]' src={story} alt="" />
-                        <img onClick={() => open('missing')} className='w-10 sm:w-12 p-2 cursor-pointer hover:bg-[#d8d8d8] duration-150 rounded-md bg-[#E9E9E9]' src={missing} alt="" />
+                        <img onClick={() => open('announcement')} className='w-9 sm:w-11 p-2 cursor-pointer hover:bg-[#d8d8d8] duration-150 rounded-md bg-[#E9E9E9]' src={announcement} alt="" />
                         <img onClick={() => open('found')} className='w-10 sm:w-12 p-2 cursor-pointer hover:bg-[#d8d8d8] duration-150 rounded-md bg-[#E9E9E9]' src={found} alt="" />
                     </div>
                 </div>

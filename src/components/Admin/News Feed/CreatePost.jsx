@@ -5,7 +5,7 @@ import { AuthContext } from '../../General/AuthProvider';
 import { notifySuccessOrange, notifyWarningOrange } from '../../General/CustomToast';
 import { db, storage } from '../../../firebase/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid'
 
 const MAX_IMAGES = 3;
@@ -52,7 +52,7 @@ function CreatePost({closeWindow, postType}) {
             }
 
             // ADD POST TO FIRESTORE
-            await addDoc(collection(db, 'userPosts'), {
+            const postRef = await addDoc(collection(db, 'userPosts'), {
                 typeOfPost: postType,
                 caption: caption,
                 images: uploadedImageUrls,
@@ -64,12 +64,39 @@ function CreatePost({closeWindow, postType}) {
                 commentCount: 0,
             })
 
+            const postID = postRef.id;
+
+            // NOTIFY ALL USERS IF ITS ANNOUNCEMENT
+            if(postType === 'announcement'){
+                const userQuery = query(collection(db, 'users'), where('role', '==', 'user'));
+                const userSnapshot = await getDocs(userQuery);
+
+                const notificationData = {
+                    postID: postID,
+                    content: 'posted an announcement.',
+                    image: userData.profilePictureURL,
+                    isRead: false,
+                    senderID: user.uid,
+                    senderName: userData.fullName,
+                    timestamp: serverTimestamp(),
+                    type: 'announcement'
+                }
+
+                for(const doc of userSnapshot.docs){
+                    const userId = doc.id;
+                    await addDoc(collection(db, 'notifications'), {
+                        ...notificationData,
+                        userId: userId,
+                    })
+                }
+            }
+
             notifySuccessOrange('Post created successfully.');
             setCaption('');
             setImages([]);
             setTimeout(() => {
                 window.location.reload();
-            }, 2000);
+            }, 1000);
         }
         catch(error){
             console.error('Error creating post: ', error);
@@ -87,7 +114,7 @@ function CreatePost({closeWindow, postType}) {
                 <img onClick={closeWindow} className='w-9 p-1 border-2 border-secondary hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
                 <h1 className='text-center shrink-0 text-2xl font-semibold pt-5'>Create Post</h1>
                 <div className='flex items-center mt-4 mb-1'>
-                    <p className='font-medium shrink-0'>Type of post:<span className='font-light px-3 text-sm text-white ml-2 rounded-full' style={{backgroundColor:postType === 'story' ? '#C18DEC' : postType === 'missing' ? '#ED5050' : '#85B728'}}>{postType}</span></p>
+                    <p className='font-medium shrink-0'>Type of post:<span className='font-light px-3 text-sm text-white ml-2 rounded-full' style={{backgroundColor:postType === 'story' ? '#C18DEC' : postType === 'announcement' ? '#ED5050' : '#85B728'}}>{postType}</span></p>
                 </div>
                 <div className='flex-grow flex flex-col min-h-0 mt-1 gap-2'>
                     <textarea spellCheck="false" value={caption} onChange={(e) => setCaption(e.target.value)} className='bg-secondary leading-5 border-[1px] px-2 pt-3 pb-1 h-12 border-[#d6d6d6] rounded-md w-full outline-none' rows="1" placeholder='Enter your caption ...' />

@@ -11,6 +11,8 @@ import EditPet from './EditPet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useImageModal } from '../../General/ImageModalContext';
 import FavoritePet from './FavoritePet';
+import yes from './assets/yes.svg'
+import no from './assets/no.svg'
 
 function PetInfo() {
     const { user } = useContext(AuthContext);
@@ -153,14 +155,29 @@ function PetInfo() {
                         </div>
                         <div className='my-2'> 
                             {/* <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center'>{pet.age} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.gender} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.size}</p>    */}
-                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.location}</p>
+                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.barangay}, Cavite</p>
                         </div>
                         <div className='w-full'>
                             <div className='h-[1px] w-full relative bg-text'></div>
                         </div>
                         <div className='my-2'> 
                             <p className='text-2xl font-medium pt-2'>About</p> 
-                            <p className='whitespace-pre-wrap'>{pet.aboutPet}</p>
+                            <p className='whitespace-pre-wrap pt-2'>{pet.aboutPet}</p>
+                        </div>
+                        <div className='w-full'>
+                            <div className='h-[1px] w-full relative bg-text'></div>
+                        </div>
+                        <div className='my-2'> 
+                            <p className='text-2xl font-medium pt-2'>RAQs</p> 
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet for free?</p>
+                            <p className={`${pet.isItFree === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.isItFree === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.isItFree === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.isItFree}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet good with kids?</p>
+                            <p className={`${pet.goodWithKids === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.goodWithKids === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.goodWithKids === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.goodWithKids}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet good with other animals?</p>
+                            <p className={`${pet.goodWithAnimals === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.goodWithAnimals === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.goodWithAnimals === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.goodWithAnimals}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet house-trained?</p>
+                            <p className={`${pet.houseTrained === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.houseTrained === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.houseTrained === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.houseTrained}</p>
+                            
                         </div>
                     </div>
                 </div>
@@ -170,8 +187,7 @@ function PetInfo() {
                     <div className={ user.uid != pet.userID ? 'w-[90%] sm:w-96 self-start lg:my-0 lg:rounded-lg shrink-0 lg:w-60 2xl:w-72 mx-auto bg-primary mt-4 mb-7 text-white shadow-custom p-3 rounded-md' : 'hidden'}>
                         <p className='text-lg text-center py-4'>Considering {pet.petName} for adoption?</p>
                         <div className='w-[90%] mx-auto py-3'>
-                            <button onClick={() => navigate(`/dashboard/find-pet/adoption/${pet.petID}`)} disabled={isPending} className={`w-full text-sm border-2 border-secondary duration-200 bg-secondary font-semibold text-primary rounded-full py-3 mb-3 ${isPending ? 'cursor-default ' : 'hover:border-[#c74343] hover:bg-[#c74343] hover:text-white'} `}>{isPending ? 'PENDING ADOPTION' : 'START YOUR INQUIRY'}</button>
-                            <button onClick={handleFaqsClick} className='w-full text-sm border-2 border-secondary bg-primary font-semibold text-secondary hover:bg-[#c74343] hover:border-[#c74343] duration-200 rounded-full py-3'>READ FAQS</button>
+                            <button onClick={() => navigate(`/dashboard/find-pet/adoption/${pet.petID}`)} disabled={isPending} className={`w-full text-sm border-2 border-secondary duration-200 bg-secondary font-semibold text-primary rounded-full py-3 ${isPending ? 'cursor-default ' : 'hover:border-[#c74343] hover:bg-[#c74343] hover:text-white'} `}>{isPending ? 'PENDING ADOPTION' : 'START YOUR INQUIRY'}</button>
                         </div>
                     </div> 
                     
@@ -195,35 +211,6 @@ function PetInfo() {
                     <div onClick={() => col === 'petsForAdoption' ? navigate('/dashboard/find-pet') : navigate('/dashboard/notification')} className='w-40 hidden lg:flex cursor-pointer hover:bg-[#f0f0f0] duration-150 bg-secondary rounded-lg shadow-custom mt-3 py-2 justify-center items-center font-semibold'>
                         <img className='w-9 mr-3' src={back} alt="" />
                         <p>Go back</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* READ FAQS */}
-            <div className={ isFaqsOpen ? 'w-full relative mb-5 bg-secondary shadow-custom sm:rounded-lg h-full lg:py-10 mt-4' : 'hidden'}>
-                <img onClick={handleFaqsClick} className='absolute border-2 border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />
-                <div className='flex flex-col lg:flex-row lg:items-center xl:w-[60rem] xl:mx-auto'>
-                    <div className='w-[80%] overflow-hidden mx-auto rounded-lg sm:w-72 mt-14 lg:mt-0 h-80 lg:ml-8 shrink-0'>
-                        <img className='w-full h-full object-cover' src={pet.petImages[0]} alt="" />
-                    </div>
-                    <div className='px-5 sm:px-7 xl:px-10 lg:pb-3 w-full'>
-                        <p className='text-2xl lg:text-3xl font-medium py-5'>{pet.petName}'s FAQs</p>
-                        <div className='pb-5'>
-                            <p className='font-medium lg:text-lg'>How much the adoption fee for {pet.petName}?</p>
-                            <p className='text-sm lg:text-base'>{pet.adoptionFee}</p>
-                        </div>
-                        <div className='pb-5'>
-                            <p className='font-medium lg:text-lg'>Is {pet.petName} good with kids?</p>
-                            <p className='text-sm lg:text-base'>{pet.goodWithKids}</p>
-                        </div>
-                        <div className='pb-5'>
-                            <p className='font-medium lg:text-lg'>Is {pet.petName} good with other animals?</p>
-                            <p className='text-sm lg:text-base'>{pet.goodWithAnimals}</p>
-                        </div>
-                        <div className='pb-10 lg:pb-0'>
-                            <p className='font-medium lg:text-lg'>When and where can I adopt {pet.petName}?</p>
-                            <p className='text-sm lg:text-base'>{pet.timeAndPlace}</p>
-                        </div>
                     </div>
                 </div>
             </div>

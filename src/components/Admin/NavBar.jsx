@@ -176,7 +176,7 @@ function NavBar() {
                         {({isActive}) => (
                         <div className='flex items-center relative'>
                             <img className='pl-5 w-12' src={ isActive ? activestats : stats} alt="" />
-                            <p className={isActive ? 'text-base text-white font-medium pl-4 leading-4' : 'text-base text-text font-medium leading-4 pl-4 '}>Adoption Management</p>
+                            <p className={isActive ? 'text-base text-white font-medium pl-4 leading-4' : 'text-base text-text font-medium leading-4 pl-4 '}>Adoption Statistics</p>
                         </div>
                         )}
                     </NavLink>

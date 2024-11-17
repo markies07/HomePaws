@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { doc, getDoc, collection, getDocs, query, where, addDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where, addDoc, orderBy } from 'firebase/firestore';
 import { db } from '../../../../firebase/firebase';
 import message from '../assets/message.svg';
 import { AuthContext } from '../../../General/AuthProvider';
@@ -65,7 +65,7 @@ function ViewProfile() {
                 setLoading(true);
 
                 const postsRef = collection(db, 'userPosts');
-                const q = query(postsRef, where('userID', '==', userID), where('isBanned', '==', false));
+                const q = query(postsRef, where('userID', '==', userID), where('isBanned', '==', false), orderBy('createdAt', 'desc'));
 
                 const querySnapshot = await getDocs(q);
                 const userPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -235,7 +235,7 @@ function ViewProfile() {
                                 <img className='w-5 sm:w-7' src={message} alt="" />
                             </div> 
                             {/* REPORT USER */}
-                            <div onClick={openReportUser} className='bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer '>
+                            <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : 'flex'} bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer`}>
                                 <img className='w-5 sm:w-7' src={reportUser} alt="" />
                             </div> 
                         </div>
@@ -244,7 +244,7 @@ function ViewProfile() {
 
                     <div className='w-1/2 hidden md:flex mt-2 md:mt-0 z-10 justify-center md:justify-end md:gap-3'>
                         {/* REPORT USER */}
-                        <div onClick={openReportUser} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
+                        <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : 'flex'} bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md`}>
                             <img className='w-9 mt-1' src={reportUser} alt="" />
                             <p className='font-medium text-center pt-2 text-xs'>Report User</p>
                         </div>
@@ -252,7 +252,7 @@ function ViewProfile() {
                         {/* MESSAGE USER */}
                         <div onClick={() => handleStartChat(userID)} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
                             <img className='w-9 mt-1' src={message} alt="" />
-                            <p className='font-medium text-center pt-2 text-xs'>Message User</p>
+                            <p className='font-medium text-center pt-2 leading-4 text-xs'>{data.role === 'admin' ? 'Message Admin' : 'Message User'}</p>
                         </div>
                     </div>
                 </div>
@@ -285,7 +285,7 @@ function ViewProfile() {
                                     <div className='flex w-full'>
                                         <img src={data.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] rounded-full' />
                                         <div className='ml-2'>
-                                            <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
+                                            <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : post.typeOfPost === 'announcement' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
                                             <p className='-mt-[3px] text-xs'>{getTimeDifference(post.createdAt)}</p>
                                         </div>
                                     </div>

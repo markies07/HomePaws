@@ -161,7 +161,7 @@ function Post() {
           <div className='flex w-full'>
               <img src={post.userProfileImage} className='w-10 h-10 bg-[#D9D9D9] rounded-full' />
               <div className='ml-2'>
-                  <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
+                  <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : post.typeOfPost === 'announcement' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
                   <p className='-mt-[3px] text-xs'>{getTimeDifference(post.createdAt)}</p>
               </div>
           </div>
@@ -174,7 +174,7 @@ function Post() {
           {/* IMAGES */}
           <div className='flex gap-2 md:gap-3 justify-center mt-2 object-cover sm:w-[80%] sm:mx-auto'>
             {post.images && post.images.length > 0 && ( 
-                post.images.map((img, index) => <img src={img} key={index} onClick={() => showModal(img)} className='w-full cursor-pointer object-cover overflow-hidden max-w-40 h-48 md:h-52 bg-[#D9D9D9] rounded-md' />
+                post.images.map((img, index) => <img src={img} key={index} onClick={() => showModal(img)} className='w-full cursor-pointer object-cover overflow-hidden max-w-40 xl:max-w-52 h-48 md:h-52 xl:h-72 bg-[#D9D9D9] rounded-md' />
             ))}
           </div>
 

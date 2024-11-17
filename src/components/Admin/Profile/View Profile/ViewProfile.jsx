@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { doc, getDoc, collection, getDocs, query, where, addDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where, addDoc, orderBy } from 'firebase/firestore';
 import { db } from '../../../../firebase/firebase';
 import message from '../assets/message.svg';
 import { AuthContext } from '../../../General/AuthProvider';
@@ -65,7 +65,7 @@ function ViewProfile() {
                 setLoading(true);
 
                 const postsRef = collection(db, 'userPosts');
-                const q = query(postsRef, where('userID', '==', userID), where('isBanned', '==', false));
+                const q = query(postsRef, where('userID', '==', userID), where('isBanned', '==', false), orderBy('createdAt', 'desc'));
 
                 const querySnapshot = await getDocs(q);
                 const userPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -284,7 +284,7 @@ function ViewProfile() {
                                     <div className='flex w-full'>
                                         <img src={data.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] rounded-full' />
                                         <div className='ml-2'>
-                                            <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
+                                            <p className='font-medium'>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : post.typeOfPost === 'announcement' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
                                             <p className='-mt-[3px] text-xs'>{getTimeDifference(post.createdAt)}</p>
                                         </div>
                                     </div>

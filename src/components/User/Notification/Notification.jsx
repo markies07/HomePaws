@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import removed from './assets/removed.svg'
 import closed from './assets/closed.svg'
 import report from './assets/report.svg'
+import announcement from './assets/announcement.svg'
 
 function Notification() {
     const { user } = useContext(AuthContext);
@@ -139,6 +140,9 @@ function Notification() {
         else if(notifType === 'comment'){
             navigate(`post/${postID}`, {state: {notifType}});
         }
+        else if(notifType === 'announcement'){
+            navigate(`post/${postID}`, {state: {notifType}});
+        }
         else if(notifType === 'adoption'){
             if(accepted){
                 navigate(`/dashboard/profile/applications/accepted/${applicationID}`, {state: {notifType}});
@@ -205,6 +209,7 @@ function Notification() {
                                         <img className={`${notification.type === 'closed' || notification.type === 'rejected' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={closed} alt="" />
                                         <img className={`${notification.type === 'adoption' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={application} alt="" />
                                         <img className={`${notification.type === 'report' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={report} alt="" />
+                                        <img className={`${notification.type === 'announcement' ? 'block' : 'hidden'} w-6 h-6 absolute rounded-full bottom-0 -right-1`} src={announcement} alt="" />
                                     </div>
                                     <div className={`pl-3 sm:pl-4 flex flex-col justify-center ${notification.isRead ? 'pr-0' : 'pr-7'}`}>
                                         <p className='font-semibold text-sm sm:text-base leading-4'>{notification.senderName} <span className='font-normal'>{notification.content}</span></p>

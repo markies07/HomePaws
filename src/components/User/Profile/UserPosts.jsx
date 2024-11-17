@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../General/AuthProvider';
-import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { useLikesAndComments } from '../../General/LikesAndCommentsContext';
 import { useImageModal } from '../../General/ImageModalContext';
@@ -32,7 +32,7 @@ function UserPosts() {
 
                 if(user){
                     const postsRef = collection(db, 'userPosts');
-                    const q = query(postsRef, where('userID', '==', user.uid), where('isBanned', '==', false));
+                    const q = query(postsRef, where('userID', '==', user.uid), where('isBanned', '==', false), orderBy('createdAt', 'desc'));
 
                     const querySnapshot = await getDocs(q);
                     const userPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
