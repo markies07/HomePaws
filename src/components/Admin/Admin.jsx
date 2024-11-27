@@ -1,21 +1,15 @@
-import React, { useContext, useEffect } from 'react'
+import React from 'react'
 import Header from './Header'
 import NavBar from './NavBar'
-import { Outlet, useNavigate } from 'react-router-dom'
-import { AuthContext } from '../General/AuthProvider'
+import { Outlet } from 'react-router-dom'
+import MeetupChecker from './MeetupChecker'
 
 function Admin() {
-  const {userData} = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if(userData?.role !== 'admin'){
-  //     navigate('/dashboard/find-pet');
-  //   }
-  // }, [userData, navigate]);
+ 
 
   return (
     <div className='w-full min-h-screen bg-[#A1E4E4] select-none font-poppins text-text'>
+       <MeetupChecker />
        <Header />
        <Outlet />
        <NavBar />

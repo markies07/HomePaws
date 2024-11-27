@@ -108,7 +108,7 @@ function RehomedPets() {
     return (
         <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-[13.8rem] lg:pr-[13px] sm:px-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
             <div className='bg-secondary flex flex-col mb-3 pt-3 overflow-hidden flex-grow sm:pt-5 relative w-full shadow-custom h-full sm:rounded-md lg:rounded-lg'>
-                <img onClick={() => window.history.back()} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
+                <img onClick={() => navigate('/admin/profile/applications/rehomed')} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
                 <p className='text-2xl text-center sm:text-start pt-6 px-3 sm:px-5 font-semibold sm:pt-0'>Rehomed Pet</p>
                 {/* PROGRESS BAR */}
                 <div className='relative sm:w-[90%] xl:w-[70%] sm:mx-auto mt-10 h-28 sm:h-auto px-5 flex justify-between'>
@@ -192,11 +192,11 @@ function RehomedPets() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Pet Owner:</p>
-                                    <p>{data?.petDetails?.ownerName}</p>
+                                    <p>{data?.petDetails?.ownerFirstName} {data?.petDetails?.ownerMI} {data?.petDetails?.ownerLastName}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Location:</p>
-                                    <p>{data?.petDetails?.location}</p>
+                                    <p className='font-semibold'>Full Address:</p>
+                                    <p>{data?.petDetails?.houseNo} {data?.petDetails?.barangay} {data?.petDetails?.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>
@@ -219,7 +219,7 @@ function RehomedPets() {
                                     <div className='w-full flex flex-col gap-2'>
                                         <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                             <p className='font-semibold'>Full Name:</p>
-                                            <p>{data?.adopterDetails?.adopterName}</p>
+                                            <p>{data?.adopterDetails?.adopterFirstName} {data?.adopterDetails?.ownerMI} {data?.adopterDetails?.ownerLastName}</p>
                                         </div>
                                         <div className='flex gap-2'>
                                             <div className='bg-secondary w-[30%] shadow-custom p-2 sm:p-3 rounded-md'>
@@ -235,7 +235,7 @@ function RehomedPets() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Full Address:</p>
-                                    <p>{data?.adopterDetails?.adopterAddress}</p>
+                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Commitment:</p>

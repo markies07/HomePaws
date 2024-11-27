@@ -12,6 +12,8 @@ import RemovePet from './RemovePet';
 import EditPet from './EditPet';
 import { confirm } from '../../General/CustomAlert';
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
+import yes from './assets/yes.svg'
+import no from './assets/no.svg'
 
 function PetInfo() {
     const { user } = useContext(AuthContext);
@@ -162,9 +164,9 @@ function PetInfo() {
 
                     {/* INFORMATION */}
                     <div className='w-full relative bg-[#E9E9E9] p-3 rounded-md sm:px-5'>
-                        
                         <div className='my-2'>
                             <p className='text-3xl font-medium pb-1'>{pet.petName}</p> 
+                            {/* <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.petType} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.location}</p>    */}
                             <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center'>{pet.petType} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.age} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.gender} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.size}</p>   
 
                         </div>
@@ -173,14 +175,29 @@ function PetInfo() {
                         </div>
                         <div className='my-2'> 
                             {/* <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center'>{pet.age} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.gender} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.size}</p>    */}
-                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.location}</p>
+                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.barangay} {pet.municipality}, Cavite</p>
                         </div>
                         <div className='w-full'>
                             <div className='h-[1px] w-full relative bg-text'></div>
                         </div>
                         <div className='my-2'> 
                             <p className='text-2xl font-medium pt-2'>About</p> 
-                            <p className='whitespace-pre-wrap'>{pet.aboutPet}</p>
+                            <p className='whitespace-pre-wrap pt-2'>{pet.aboutPet}</p>
+                        </div>
+                        <div className='w-full'>
+                            <div className='h-[1px] w-full relative bg-text'></div>
+                        </div>
+                        <div className='my-2'> 
+                            <p className='text-2xl font-medium pt-2'>RAQs</p> 
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet for free?</p>
+                            <p className={`${pet.isItFree === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.isItFree === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.isItFree === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.isItFree}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet good with kids?</p>
+                            <p className={`${pet.goodWithKids === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.goodWithKids === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.goodWithKids === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.goodWithKids}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet good with other animals?</p>
+                            <p className={`${pet.goodWithAnimals === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.goodWithAnimals === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.goodWithAnimals === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.goodWithAnimals}</p>
+                            <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet house-trained?</p>
+                            <p className={`${pet.houseTrained === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.houseTrained === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.houseTrained === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.houseTrained}</p>
+                            
                         </div>
                     </div>
                 </div>

@@ -13,11 +13,11 @@ function Contract({data}) {
 
         This agreement is made on ${formatDate(data.meetupSchedule.meetUpDate)} by and between:
 
-        Pet Owner: ${data.petDetails.ownerName}, residing at ${data.petDetails.location}
+        Pet Owner: ${data.petDetails.ownerLastName}, ${data.petDetails.ownerFirstName} ${data.petDetails.ownerMI}, residing at ${data.petDetails.houseNo} ${data.petDetails.barangay} ${data.petDetails.municipality}, Cavite
 
         AND
 
-        Adopter: ${data.adopterDetails.adopterName}, residing at ${data.adopterDetails.adopterAddress}
+        Adopter: ${data.adopterDetails.adopterLastName}, ${data.adopterDetails.adopterFirstName} ${data.adopterDetails.adopterMI}, residing at ${data.adopterDetails.houseNo} ${data.adopterDetails.barangay} ${data.adopterDetails.municipality}, Cavite
 
         regarding the adoption of the following pet:
 

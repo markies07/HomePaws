@@ -155,7 +155,7 @@ function PetInfo() {
                         </div>
                         <div className='my-2'> 
                             {/* <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center'>{pet.age} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.gender} <span className='h-1 w-1 mx-2 bg-text rounded-full'></span> {pet.size}</p>    */}
-                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.barangay}, Cavite</p>
+                            <p className='font-medium py-2 text-sm text-[#5D5D5D] flex items-center leading-3'>{pet.barangay} {pet.municipality}, Cavite</p>
                         </div>
                         <div className='w-full'>
                             <div className='h-[1px] w-full relative bg-text'></div>

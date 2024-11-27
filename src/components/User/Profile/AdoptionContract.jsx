@@ -13,11 +13,11 @@ function AdoptionContract({data, pet}) {
 
         This agreement is made on ${formatDate(data.meetupSchedule.meetUpDate)} by and between:
 
-        Pet Owner: ${data.petOwnerName}, residing at ${pet.location}
+        Pet Owner: ${pet.ownerLastName}, ${pet.ownerFirstName} ${pet.ownerMI}, residing at ${pet.houseNo} ${pet.barangay} ${pet.municipality}, Cavite
 
         AND
 
-        Adopter: ${data.adopterName}, residing at ${data.fullAddress}
+        Adopter: ${data.adopterLastName}, ${data.adopterFirstName} ${data.adopterMI}, residing at ${data.houseNo} ${data.barangay} ${data.municipality}, Cavite
 
         regarding the adoption of the following pet:
 
@@ -73,7 +73,7 @@ function AdoptionContract({data, pet}) {
       
       
 
-      const generatePDF = async () => {
+    const generatePDF = async () => {
         const contractText = await generateAdoptionContract();
         const doc = new jsPDF();
     

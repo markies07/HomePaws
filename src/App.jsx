@@ -50,18 +50,6 @@ import AdViewProfile from "./components/Admin/Profile/View Profile/ViewProfile"
 
 
 function App() {
-  // Create a new component to handle the default redirect based on user role
-  const DefaultRedirect = () => {
-    const { userData } = useContext(AuthContext);
-    
-    // Redirect based on role
-    if (userData?.role === 'admin') {
-      return <Navigate replace to="/admin/pet-management" />;
-    }
-    else if(userData?.role === 'user'){
-      return <Navigate replace to="/dashboard/find-pet" />;
-    }
-  };
   
   return (
     <AuthProvider>
@@ -76,10 +64,9 @@ function App() {
                     <Route path="/" element={<LandingPage />} />
 
                     {/* DEFAULT REDIRECT ROUTE */}
-                    <Route path="/admin" element={<DefaultRedirect />} />
 
                     {/* ADMIN ROUTE */}
-                    <Route element={<PrivateRoute />}>
+                    <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                       <Route path="/admin/*" element={<AdDashboard />} >
 
                         {/* PET MANAGEMENT SECTION */}
@@ -138,7 +125,7 @@ function App() {
 
 
                     {/* USER ROUTE */}
-                    <Route element={<PrivateRoute />}>
+                    <Route element={<PrivateRoute allowedRoles={['user']} />}>
                       <Route path="/dashboard/*" element={<Dashboard />}>
                         {/* FIND PET SECTION */}
                         <Route path="find-pet" element={<FindPet />} />
@@ -205,3 +192,25 @@ function App() {
 }
 
 export default App
+
+
+
+
+
+
+
+// rules_version = '2';
+// 2
+// service cloud.firestore {
+// 3
+//   match /databases/{database}/documents {
+// 4
+//     match /{document=**} {
+// 5
+//       allow read, write: if request.time < timestamp.date(2026, 1, 1);
+// 6
+//     }
+// 7
+//   }
+// 8
+// }

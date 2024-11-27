@@ -64,7 +64,7 @@ function Content({ onLoginClick, open }) {
       <div className='mt-52 flex justify-center flex-col items-center'>
         <h1 className='text-[#5D5D5D] inline-block font-semibold text-center text-3xl px-5'>Pets Available for Adoption
         </h1>
-        <div className={`${pets.length < 3 ? 'gap-3 sm:gap-5 grid grid-cols-2 sm:grid-cols-3' : 'gap-3 sm:gap-5 grid grid-cols-2 md:grid-cols-4'} mt-10 mx-5 mb-40`}>
+        <div className={`${pets.length < 3 ? 'gap-3 sm:gap-5 grid grid-cols-2 sm:grid-cols-3' : 'gap-3 sm:gap-5 grid grid-cols-2 md:grid-cols-4'} mt-10 mx-5 mb-20`}>
           <AnimalCard onLoginClick={onLoginClick} />
           <div className='w-full max-w-48 relative m-auto items-center justify-between h-64 bg-primary flex flex-col drop-shadow-lg rounded-xl overflow-hidden'>
             <img className='w-32 pt-4' src={logo} alt="" />

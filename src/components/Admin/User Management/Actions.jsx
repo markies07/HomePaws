@@ -6,8 +6,6 @@ import SetAdmin from './SetAdmin'
 
 function Actions({data, closeUI}) {
 
-
-
     return (
         <div className='fixed inset-0 flex justify-center items-center z-50 bg-black/70'>
             <div className="relative px-5 bg-secondary w-[90%] sm:w-[23rem] h-auto rounded-lg py-6 flex flex-col">

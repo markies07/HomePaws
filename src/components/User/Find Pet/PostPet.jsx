@@ -63,14 +63,12 @@ function PostPet({closePostPet}) {
         }
     }
 
-    const handleRadioChange = (event) => {
-        setFormData({
-            ...formData, 
-            isItFree: event.target.value,
-            goodWithKids: event.target.value,
-            goodWithAnimals: event.target.value,
-            houseTrained: event.target.value,
-        })
+    const handleRadioChange = (e) => {
+        const { name, value } = e.target; // Extract the name and value from the event
+        setFormData((prevState) => ({
+            ...prevState,        // Spread the previous state
+            [name]: value        // Update only the relevant field
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -85,7 +83,7 @@ function PostPet({closePostPet}) {
         }
 
         if(wordCount < 15) {
-            notifyErrorOrange('Please enter at least 15 words About Pet.');
+            notifyErrorOrange('Please enter at least 15 words About the Pet.');
             return;
         }
 
@@ -259,6 +257,7 @@ function PostPet({closePostPet}) {
                                     <option className="text-text py-2" value="Brown">Brown</option>
                                     <option className="text-text py-2" value="Gray">Gray</option>
                                     <option className="text-text py-2" value="Orange">Orange</option>
+                                    <option className="text-text py-2" value="Black & White">Black & White</option>
                                     <option className="text-text py-2" value="Multi-Color">Multi-Color</option>
                                 </select>
                             </div>

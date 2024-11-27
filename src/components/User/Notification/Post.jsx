@@ -1,6 +1,6 @@
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { db } from '../../../firebase/firebase';
 import unlike from './assets/unlike.svg'
 import like from './assets/like.svg'
@@ -26,6 +26,7 @@ function Post() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const { notifType } = location.state || {};
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -143,6 +144,36 @@ function Post() {
     }
   };
 
+  const handleStartChat = async (receiver) => {
+
+    const q = query(
+        collection(db, 'chats'),
+        where('participants', 'array-contains', receiver && user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+    let existingChat = null;
+
+    querySnapshot.forEach(doc => {
+        const participants = doc.data().participants;
+        if(participants.includes(receiver)) {
+            existingChat = doc.id;
+        }
+    });
+
+    let chatID;
+    if(existingChat){
+        chatID = existingChat;
+    }
+    else{
+        const newChatRef = await addDoc(collection(db, 'chats'), {
+            participants: [user.uid, receiver],
+        })
+        chatID = newChatRef.id;
+    }
+    navigate(`/dashboard/chat/convo/${chatID}`);
+  }
+
   if(loading){
     return <p className='bg-secondary py-3 rounded-md shadow-custom w-full text-center'>Loading post ...</p>
   }
@@ -186,7 +217,7 @@ function Post() {
                       <p className='text-sm ml-2' style={{ display: isLiked ? 'none' : 'flex'}}>{post.likeCount}</p>
                       <p className='text-sm ml-2' style={{ display: isLiked ? 'flex' : 'none'}}>{post.likeCount + 1}</p>
                   </div>
-                  <div className='items-center flex ' style={{ display: post.commentCount <= 0 ? 'none' : 'flex'}}>
+                  <div className='items-center flex' style={{ display: post.commentCount <= 0 ? 'none' : 'flex'}}>
                       <p className='text-sm ml-2'>{post.commentCount} comment{post.commentCount > 1 ? 's' : ''}</p>
                   </div>
               </div>
@@ -207,7 +238,7 @@ function Post() {
                   <img className='w-[21px]' src={comment} alt="" />
                   <p className='font-semibold pl-1 sm:pl-2 text-sm'>Comment</p>
               </div>
-              <div className='flex items-center opacity-60'>
+              <div onClick={() => handleStartChat(post.userID)} className={`${post.userID !== user.uid ? 'opacity-100 cursor-pointer' : 'opacity-60 pointer-events-none'} flex items-center`}>
                   <img className='w-5' src={message} alt="" />
                   <p className='font-semibold pl-1 sm:pl-2 text-sm'>Message</p>
               </div>

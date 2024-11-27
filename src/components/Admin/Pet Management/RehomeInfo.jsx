@@ -217,15 +217,15 @@ function RehomeInfo() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Pet Owner:</p>
-                                    <p>{data?.petDetails?.ownerName}</p>
+                                    <p>{data?.petDetails?.ownerFirstName} {data?.petDetails?.ownerMI} {data?.petDetails?.ownerLastName}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Location:</p>
-                                    <p>{data?.petDetails?.location}</p>
+                                    <p className='font-semibold'>Full Address:</p>
+                                    <p>{data?.petDetails?.houseNo} {data?.petDetails?.barangay} {data?.petDetails?.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>
-                                <button onClick={() => handleStartChat(data.ownerUserID)} className={` bg-[#6AAAAA] flex leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Previous Owner</button>
+                                <button onClick={() => handleStartChat(data.ownerUserID)} className={`${data?.adopterUserID === user.uid ? 'hidden' : 'flex'} bg-[#6AAAAA] leading-snug cursor-pointer duration-150 hover:bg-[#619b9b] items-center text-xs md:text-base font-medium gap-2 text-white p-2 rounded-md`}><img className='w-4 h-4' src={comment} alt="" />Message Previous Owner</button>
                             </div>
                         </div>
                     </div>
@@ -241,7 +241,7 @@ function RehomeInfo() {
                                     <div className='w-full flex flex-col gap-2'>
                                         <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                             <p className='font-semibold'>Full Name:</p>
-                                            <p>{data?.adopterDetails?.adopterName}</p>
+                                            <p>{data?.adopterDetails?.adopterFirstName} {data?.adopterDetails?.ownerMI} {data?.adopterDetails?.ownerLastName}</p>
                                         </div>
                                         <div className='flex gap-2'>
                                             <div className='bg-secondary w-[30%] shadow-custom p-2 sm:p-3 rounded-md'>
@@ -257,7 +257,7 @@ function RehomeInfo() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Full Address:</p>
-                                    <p>{data?.adopterDetails?.adopterAddress}</p>
+                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Commitment:</p>

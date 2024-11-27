@@ -95,16 +95,18 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
                     const updatedUserSnapshot = await getDoc(userRef);
                 
                     const role = updatedUserSnapshot.data().role;
-
+                    console.log(role)
 
                     if(role) {
                         if (role === 'admin') {
                             navigate('/admin/pet-management');
                             notifySuccessOrange('Login Successfully!');
+                            console.log(role)
                         }
-                        else if(role === 'user'){
+                        if(role === 'user'){
                             navigate('/dashboard/find-pet');
                             notifySuccessOrange('Login Successfully!');
+                            console.log(role)
                         }  
                     }
                 }
@@ -113,7 +115,6 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
         }
         catch (error) {
             console.error('Error during Google login:', error);
-            notifyErrorOrange("Failed to log in with Google.")
         }
     }
 

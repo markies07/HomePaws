@@ -16,7 +16,8 @@ function FindPet() {
     age: 'Any',
     gender: 'Any',
     size: 'Any',
-    color: 'Any'
+    color: 'Any',
+    municipality: 'Any'
   });
 
   useEffect(() => {

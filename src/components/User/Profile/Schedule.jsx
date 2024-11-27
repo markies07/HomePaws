@@ -2,14 +2,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { AuthContext } from '../../General/AuthProvider'
 import { db } from '../../../firebase/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { successAlert } from '../../General/CustomAlert';
 import { notifyErrorOrange } from '../../General/CustomToast';
 import paw from './assets/white-paw.svg'
 import RehomedComplete from './RehomedComplete'
 
-function Schedule({closeUI, data, pet, adopter}) {
-    const {user} = useContext(AuthContext);
+function Schedule({closeUI, isMeetup, data, pet, adopter}) {
+    const {user, userData} = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [meetUpDate, setMeetUpDate] = useState('');
     const [meetUpTime, setMeetUpTime] = useState('');
@@ -60,6 +60,21 @@ function Schedule({closeUI, data, pet, adopter}) {
                 status: 'scheduled',
                 isScheduled: true,
             }
+
+            // NOTIFICATION
+            const notificationRef = collection(db, 'notifications');
+            await addDoc(notificationRef, {
+                content: `submitted your meet up schedule with ${data.petName}.`,
+                applicationID: data.applicationID,
+                type: 'adoption',
+                image: userData.profilePictureURL,
+                senderName: userData.fullName,
+                senderId: user.uid,
+                userId: data.adopterUserID,
+                isRead: false,
+                accepted: true,
+                timestamp: serverTimestamp(),
+            });
     
             await updateDoc(applicationRef, meetUpData);
             successAlert('Meet-up schedule submitted successfully!');
@@ -163,8 +178,8 @@ function Schedule({closeUI, data, pet, adopter}) {
 
                         {/* BUTTONS */}
                         <div className='flex justify-center gap-2 pt-7'>
-                            <button onClick={() => setIsScheduled(false)} className={`${data.status !== 'meetup' ? 'block' : 'hidden'} bg-[#D25A5A] hover:bg-[#c25454] cursor-pointer duration-150  font-medium gap-2 text-white py-1 px-4 rounded-md`}>RESCHEDULE</button>
-                            <RehomedComplete adopter={adopter} data={data} pet={pet} />
+                            <button onClick={() => setIsScheduled(false)} className={`${isMeetup ? 'hidden' : data.status !== 'meetup' ? 'block' : 'hidden'} bg-[#D25A5A] hover:bg-[#c25454] cursor-pointer duration-150  font-medium gap-2 text-white py-1 px-4 rounded-md`}>RESCHEDULE</button>
+                            <RehomedComplete isMeetup={isMeetup} adopter={adopter} data={data} pet={pet} />
                         </div>
                        
                     </div>

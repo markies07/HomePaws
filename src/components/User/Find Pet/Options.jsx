@@ -18,7 +18,34 @@ function Options({openPostPet, changeFilter, selected, onFilterChange, filters})
     age: ['Any', 'Puppy/Kitten', 'Young', 'Adult', 'Senior'],
     gender: ['Any', 'Male', 'Female'],
     size: ['Any', 'Small', 'Medium', 'Large'],
-    color: ['Any', 'Black', 'White', 'Brown', 'Gray', 'Orange', 'Multi-Color']
+    color: ['Any', 'Black', 'White', 'Brown', 'Gray', 'Orange', 'Multi-Color'],
+    municipality: [
+      "Any",
+      "Alfonso",
+      "Amadeo",
+      "Bacoor",
+      "Carmona",
+      "Cavite City",
+      "Dasmariñas",
+      "General Emilio Aguinaldo",
+      "General Mariano Alvarez",
+      "General Trias",
+      "Imus",
+      "Indang",
+      "Kawit",
+      "Magallanes",
+      "Maragondon",
+      "Mendez",
+      "Naic",
+      "Noveleta",
+      "Rosario",
+      "Silang",
+      "Tagaytay",
+      "Tanza",
+      "Ternate",
+      "Trece Martires",
+     
+    ]
   };
 
   const handleFilterChange = (filterName, value) => {
