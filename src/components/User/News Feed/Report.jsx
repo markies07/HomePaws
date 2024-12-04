@@ -49,6 +49,7 @@ function Report({postID, closeReport}) {
         }
     };
 
+
     const closeIt = () => {
         closeReport();
         setSelectedReason('');

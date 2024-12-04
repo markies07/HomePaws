@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
-import { addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
-function Reject({application, closeReject, petImage}) {
+function Reject({petName, sendEmailNotification, application, closeReject, petImage}) {
     const [rejectReason, setRejectReason] = useState('');
     const [loading, setLoading] = useState(false);
     const {user, userData} = useContext(AuthContext);
@@ -36,6 +36,25 @@ function Reject({application, closeReject, petImage}) {
                 rejectedAt: serverTimestamp(),
             });
 
+            const adopterDocRef = doc(db, 'users', applicationData.adopterUserID);
+            const adopterDocSnap = await getDoc(adopterDocRef);
+            const adopterData = adopterDocSnap.data();
+            
+            // Check lastActive timestamp
+            if (adopterData && adopterData.lastActive) {
+                const now = Timestamp.now();
+                const lastActive = adopterData.lastActive;
+                const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                if (differenceInMinutes >= 3) {
+                    // Send email notification if the post owner has been inactive for 3 minutes or more
+                    await sendEmailNotification(
+                        adopterData.email
+                        ,`Your adoption application has been rejected.`,
+                        `${petName}'s owner rejected your adoption application.\nclick here: https://paws-ae1eb.web.app/`,
+                    );
+                }
+            }
 
             // NOTIFICATION
             const notificationRef = collection(db, 'notifications');

@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import close from './assets/close.svg'
-import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
+import { Timestamp, addDoc, collection, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../../../firebase/firebase'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AuthContext } from '../../General/AuthProvider'
 import Reject from './Reject'
 import RejectionDetails from './RejectionDetails'
 import { confirm, successAlert } from '../../General/CustomAlert'
+import emailjs from '@emailjs/browser';
 
 function Application() {
     const navigate = useNavigate();
@@ -66,6 +67,27 @@ function Application() {
         }
     }, [applicationID]);
 
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail, subject, message) => {
+        try {
+            const templateParams = {
+                subject: subject,
+                message: message,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
+
     // ACCEPTING APPLICATION
     const acceptApplication = async () => {
         confirm(`Accepting Adoption Application`, `Are you sure you want to accept this application?`).then(async (result) => {
@@ -97,6 +119,23 @@ function Application() {
                         await updateDoc(applicationRef, {
                             status: 'accepted',
                         });
+
+
+                        // Check lastActive timestamp
+                        if (adopterData && adopterData.lastActive) {
+                            const now = Timestamp.now();
+                            const lastActive = adopterData.lastActive;
+                            const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                            if (differenceInMinutes >= 3) {
+                                // Send email notification if the post owner has been inactive for 3 minutes or more
+                                await sendEmailNotification(
+                                    adopterData.email
+                                    ,`Your adoption application has been accepted!`,
+                                    `${petData.petName}'s owner accepted your adoption application.\nclick here: https://paws-ae1eb.web.app/`,
+                                );
+                            }
+                        }
 
                         // NOTIFICATION
                         const notificationRef = collection(db, 'notifications');
@@ -135,7 +174,7 @@ function Application() {
 
     const image = petData.petImages && petData.petImages.length > 0 ? petData.petImages[0] : null;
 
-    console.log(image)
+    console.log(petData)
    
 
     return (
@@ -257,7 +296,7 @@ function Application() {
 
                 {/* REJECTING APPLICATION */}
                 <div className={`${isRejectOpen ? 'block' : 'hidden'}`}>
-                    <Reject application={applicationData} petImage={image} closeReject={toggleReject} />
+                    <Reject petName={petData.petName} sendEmailNotification={sendEmailNotification} application={applicationData} petImage={image} closeReject={toggleReject} />
                 </div>
 
                 <div className={`${isRejectionDetailsOpen ? 'block' : 'hidden'}`}>

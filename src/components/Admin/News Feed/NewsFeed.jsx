@@ -21,7 +21,7 @@ function NewsFeed() {
         <div className='order-1 lg:order-2'>
           <Actions open={openCreatePost} />
         </div>
-        <div className='order-2 lg:order-1 justify-center flex flex-col gap-3 mx-auto lg:mx-0 mt-3 mb-4 lg:my-3 w-full sm:w-[90%] lg:pr-[14.2rem] lg:w-full'>
+        <div className='order-2 lg:order-1 justify-center flex flex-col gap-3 mx-auto lg:mx-0 mt-3 mb-4 lg:my-3 w-full sm:w-[90%] lg:pr-[14rem] lg:w-full'>
           <Posts />
         </div>
         <div className={isCreatePostOpen ? 'block' : 'hidden'}>

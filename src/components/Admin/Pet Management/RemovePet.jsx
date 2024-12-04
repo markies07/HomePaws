@@ -2,10 +2,11 @@ import React, { useContext, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { notifyErrorOrange } from '../../General/CustomToast';
 import { successAlert } from '../../General/CustomAlert';
-import { addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
+import emailjs from '@emailjs/browser';
 
 function RemovePet({petName, pet, closeUI}) {
     const {user} = useContext(AuthContext);
@@ -37,6 +38,25 @@ function RemovePet({petName, pet, closeUI}) {
                 removedAt: serverTimestamp(),
             });
 
+            const ownerDocRef = doc(db, 'users', pet.userID);
+            const ownerDocSnap = await getDoc(ownerDocRef);
+            const ownerData = ownerDocSnap.data();
+
+            // Check lastActive timestamp
+            if (ownerData && ownerData.lastActive) {
+                const now = Timestamp.now();
+                const lastActive = ownerData.lastActive;
+                const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                if (differenceInMinutes >= 3) {
+                    // Send email notification if the post owner has been inactive for 3 minutes or more
+                    await sendEmailNotification(
+                        ownerData.email
+                        ,`Your pet has been removed in HomePaws!`,
+                        `${pet.petName} has been removed from pet for adoption.\nclick here: https://paws-ae1eb.web.app/`,
+                    );
+                }
+            }
 
             // NOTIFICATION
             const notificationRef = collection(db, 'notifications');
@@ -66,6 +86,27 @@ function RemovePet({petName, pet, closeUI}) {
         }
 
     }
+
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail, subject, message) => {
+        try {
+            const templateParams = {
+                subject: subject,
+                message: message,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
 
     return (
         <div className='fixed inset-0 flex justify-center items-center z-50 bg-black/70'>

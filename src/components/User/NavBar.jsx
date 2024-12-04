@@ -11,7 +11,7 @@ import notification from './assets/notification.svg'
 import activenotification from './assets/active-notification.svg'
 import { NavLink } from 'react-router-dom'
 import { AuthContext } from '../General/AuthProvider'
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore'
 import { db } from '../../firebase/firebase'
 
 function NavBar() {
@@ -19,51 +19,48 @@ function NavBar() {
   const [hasUnseenNotif, setHasUnseenNotif] = useState(false);
   const [hasUnseenMess, setHasUnseenMess] = useState(false);
 
-  const fetchUnseenNotif = async () => {
+  useEffect(() => {
+    if (!user || !user.uid) return;
+  
+    // Listener for unseen notifications
     const notificationRef = collection(db, 'notifications');
-    const q = query(notificationRef, where('userId', '==', user.uid), where('isRead', '==', false));
-
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
-  }
-
-  const fetchUnseenMess = async () => {
+    const notificationQuery = query(notificationRef, where('userId', '==', user.uid), where('isRead', '==', false));
+  
+    const unsubscribeNotifications = onSnapshot(notificationQuery, (snapshot) => {
+      setHasUnseenNotif(!snapshot.empty); // If there are unseen notifications, set to true
+    });
+  
+    // Listener for unseen messages
     const chatQuery = query(
       collection(db, 'chats'),
       where('participants', 'array-contains', user.uid)
     );
   
-    const chatSnapshot = await getDocs(chatQuery);
-    let hasUnseenMessages = false;
-
-    for(const chatDoc of chatSnapshot.docs){
-      const messagesRef = collection(db, `chats/${chatDoc.id}/messages_${user.uid}`);
-      const unseenMessagesQuery = query(messagesRef, where('read', '==', false));
-
-      const unseenMessagesSnapshot = await getDocs(unseenMessagesQuery);
-
-      if(!unseenMessagesSnapshot.empty){
-        hasUnseenMessages = true;
-        break;
-      }
-    }
-    return hasUnseenMessages;
-  }
-
-
-  useEffect(() => {
-    const getNotifStatus = async () => {
-      const unseen = await fetchUnseenNotif();
-      setHasUnseenNotif(unseen);
-    }
-
-    const getMessStatus = async () => {
-      const unread = await fetchUnseenMess();
-      setHasUnseenMess(unread);
-    }
-
-    getMessStatus();
-    getNotifStatus();
+    const unsubscribeMessages = onSnapshot(chatQuery, async (chatSnapshot) => {
+      let hasUnseenMessages = false;
+  
+      const checkMessages = async () => {
+        for (const chatDoc of chatSnapshot.docs) {
+          const messagesRef = collection(db, `chats/${chatDoc.id}/messages_${user.uid}`);
+          const unseenMessagesQuery = query(messagesRef, where('read', '==', false));
+  
+          const messagesSnapshot = await getDocs(unseenMessagesQuery);
+          if (!messagesSnapshot.empty) {
+            hasUnseenMessages = true;
+            break; // Stop checking further if one unread message is found
+          }
+        }
+      };
+  
+      await checkMessages();
+      setHasUnseenMess(hasUnseenMessages);
+    });
+  
+    // Cleanup listeners on unmount
+    return () => {
+      unsubscribeNotifications();
+      unsubscribeMessages();
+    };
   }, [user.uid]);
 
 

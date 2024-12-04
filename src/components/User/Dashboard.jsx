@@ -9,6 +9,7 @@ import { db } from '../../firebase/firebase';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import MeetupChecker from './MeetupChecker';
 import Search from './Search';
+import ActivityTracker from '../General/ActivityTracker';
 
 function Dashboard() {
     const { user } = useContext(AuthContext);
@@ -75,8 +76,6 @@ function Dashboard() {
         setSearchIsOpen(!searchIsOpen);
     }
 
-
-
     if(isLoading){
         return <LoadingScreen />
     }
@@ -86,6 +85,7 @@ function Dashboard() {
         <div className='w-full min-h-screen bg-[#A1E4E4] select-none font-poppins text-text'>
             <div className={`${searchIsOpen ? 'hidden' : 'block'}`}>
                 <MeetupChecker />
+                <ActivityTracker />
                 <Header openLogout={handleLogoutClick} searchOpen={toggleSearch} isOpen={isLogoutOpen} loading={setIsLoading}/>
                 {!petOwnerTypeExists ? <Question petOwnerType={handlePetOwnerType} /> : <Outlet />}
                 <NavBar />

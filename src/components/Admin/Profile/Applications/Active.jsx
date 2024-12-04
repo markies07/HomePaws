@@ -6,13 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import pending from '../assets/pending.svg';
 
 function Active() {
-    const [activeApplications, setActiveApplications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('All');
     const [adopterProfiles, setAdopterProfiles] = useState({});
     const [adopterName, setAdopterName] = useState({});
     const [otherApplications, setOtherApplications] = useState([]);
-    const [myApplications, setMyApplications] = useState([]);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -47,33 +44,17 @@ function Active() {
             orderBy('dateSubmitted', 'desc')
         );
   
-        const myApplicationsRef = query(
-            collection(db, 'adoptionApplications'), 
-            where('adopterUserID' , '==', user.uid), 
-            where('status', '==', 'pending'),
-            orderBy('dateSubmitted', 'desc')
-        );
-  
-        const [otherSnapshot, mySnapshot] = await Promise.all([
-            getDocs(otherApplicationsRef),
-            getDocs(myApplicationsRef)
-        ]);
+        const otherSnapshot = await getDocs(otherApplicationsRef);
   
         const otherApplications = otherSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
+          id: doc.id,
+          ...doc.data(),
         }));
   
         // Fetch profile pictures for other applications
         await Promise.all(otherApplications.map(app => fetchAdopterProfile(app.adopterUserID)));
   
-        const myApplications = mySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
-  
         setOtherApplications(otherApplications);
-        setMyApplications(myApplications);
       }
       catch(error){
           console.error(error);
@@ -135,39 +116,18 @@ function Active() {
       </div>
     );
 
-    const filteredApplications = () => {
-        switch(filter) {
-            case 'Adoptee':
-                return myApplications.map(app => renderApplication(app, true));
-            case 'Adopter':
-                return otherApplications.map(app => renderApplication(app, false));
-            default:
-                return [
-                    ...otherApplications.map(app => renderApplication(app, false)),
-                    ...myApplications.map(app => renderApplication(app, true))
-                ];
-        }
-    }
-
     return (
         <div>
             <p className='text-lg font-semibold pt-1 sm:pt-0 sm:text-xl'>Active Applications</p>
-            
-            {/* FILTERING */}
-            <div className='flex mb-3 sm:mb-4 mt-2 gap-1'>
-                {['All', 'Adoptee', 'Adopter'].map(buttonText => (
-                    <button key={buttonText} onClick={() => setFilter(buttonText)} className={`text-xs sm:text-sm font-medium px-2 sm:px-3 cursor-pointer py-1 ${filter === buttonText ? 'bg-primary rounded-md text-white' : ''}`}>{buttonText}</button>
-                ))}
-            </div>
 
             {/* APPLICATIONS */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 mt-3'>
                 {loading ? (
                     <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">Loading...</div>
                 ) : 
-                filteredApplications().length > 0 ? (
+                otherApplications.length > 0 ? (
                     <div className='flex flex-col gap-2'>
-                        {filteredApplications()}
+                        {otherApplications.map(app => renderApplication(app, false))}
                     </div>
                 ) : (
                     <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">No Active Application Found</div>

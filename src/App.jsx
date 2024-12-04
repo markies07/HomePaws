@@ -192,25 +192,3 @@ function App() {
 }
 
 export default App
-
-
-
-
-
-
-
-// rules_version = '2';
-// 2
-// service cloud.firestore {
-// 3
-//   match /databases/{database}/documents {
-// 4
-//     match /{document=**} {
-// 5
-//       allow read, write: if request.time < timestamp.date(2026, 1, 1);
-// 6
-//     }
-// 7
-//   }
-// 8
-// }

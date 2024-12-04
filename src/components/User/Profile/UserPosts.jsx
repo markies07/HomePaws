@@ -130,6 +130,13 @@ function UserPosts() {
             if(result.isConfirmed){
                 try{
                     await deleteDoc(doc(db, 'userPosts', postID));
+
+                    const notificationsQuery = query(collection(db, 'notifications'), where('postID', '==', postID));
+                    const notificationsSnapshot = await getDocs(notificationsQuery);
+                    notificationsSnapshot.forEach(async (doc) => {
+                        await deleteDoc(doc.ref);
+                    });
+
                     notifySuccessOrange(`Your post has been deleted.`);
                     setTimeout(() => {
                         window.location.reload();

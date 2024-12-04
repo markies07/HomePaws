@@ -183,11 +183,20 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
         });
     };
 
+    const today = new Date();
+    const scheduleDate = new Date(data?.meetupSchedule?.meetUpDate);
+
+    today.setHours(0, 0, 0, 0);
+    scheduleDate.setHours(0, 0, 0, 0);
+
+    console.log(scheduleDate <= today)
+
+
     return (
         <div>
             <button
                 onClick={RehomeComplete}
-                className={`${isMeetup && data.petOwnerID === user.uid ? 'flex' : 'hidden'} bg-[#84B725] hover:bg-[#76a321] text-xs md:text-base cursor-pointer duration-150 items-center font-medium gap-2 text-white p-2 rounded-md`}
+                className={`${scheduleDate <= today && data.petOwnerID === user.uid ? 'flex' : 'hidden'} bg-[#84B725] hover:bg-[#76a321] text-xs md:text-base cursor-pointer duration-150 items-center font-medium gap-2 text-white p-2 rounded-md`}
             >
                 <img className="w-5 h-5" src={paw} alt="" />
                 Rehome Complete

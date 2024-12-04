@@ -1,16 +1,38 @@
 import React, { useContext, useState } from 'react'
 import close from './assets/close-dark.svg'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 
 function CancelRehome({data, pet, closeCancel}) {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const {user, userData} = useContext(AuthContext);
     const [cancelReason, setCancelReason] = useState('');
+
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail, subject, message) => {
+        try {
+            const templateParams = {
+                subject: subject,
+                message: message,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
 
     const handleCancelRehome = async () => {
         setLoading(true);
@@ -43,6 +65,26 @@ function CancelRehome({data, pet, closeCancel}) {
             await updateDoc(applicationRef, {
                 status: 'rejected',
             });
+
+            const adopterDocRef = doc(db, 'users', data.adopterUserID);
+            const adopterDocSnap = await getDoc(adopterDocRef);
+            const adopterData = adopterDocSnap.data();
+
+            // Check lastActive timestamp
+            if (adopterData && adopterData.lastActive) {
+                const now = Timestamp.now();
+                const lastActive = adopterData.lastActive;
+                const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                if (differenceInMinutes >= 3) {
+                    // Send email notification if the post owner has been inactive for 3 minutes or more
+                    await sendEmailNotification(
+                        adopterData.email
+                        ,`Your adoption application has been canceled!`,
+                        `${data.petName}'s owner cancel your adoption application.\nclick here: https://paws-ae1eb.web.app/`,
+                    );
+                }
+            }
 
             // Query and delete all notifications related to this applicationID
             const notificationsRef = collection(db, 'notifications');

@@ -5,12 +5,13 @@ import image from './assets/image.svg'
 import send from './assets/send.svg'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { AuthContext } from '../../General/AuthProvider'
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db, storage } from '../../../firebase/firebase'
 import { notifyErrorOrange } from '../../General/CustomToast'
 import { confirm } from '../../General/CustomAlert'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { useImageModal } from '../../General/ImageModalContext'
+import emailjs from '@emailjs/browser';
 
 function Conversation() {
     const navigate = useNavigate();
@@ -72,6 +73,27 @@ function Conversation() {
         }
         
     }, [chatID]);
+
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail, senderName) => {
+        try {
+            const templateParams = {
+                subject: `You have a new message in HomePaws`,
+                message: `${senderName} sent you a message. \n click here: https://paws-ae1eb.web.app/`,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
     
     // For sending messages
     const handleSendMessage = async (imageUrl = null) => {
@@ -110,6 +132,18 @@ function Conversation() {
                     sentAt: serverTimestamp()
                 }
             });
+
+
+            if (otherUser && otherUser.lastActive) {
+                const now = Timestamp.now();
+                const lastActive = otherUser.lastActive;
+                const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                if (differenceInMinutes >= 3) {
+                    // User has been inactive for 3 minutes or more
+                    await sendEmailNotification(otherUser.email, user.displayName || 'Someone');
+                }
+            }
     
             // Clear message input and imageUrl state
             setNewMessage('');
@@ -119,6 +153,14 @@ function Conversation() {
             notifyErrorOrange('Error sending message. Please try again.');
         }
     };
+
+    const now = Timestamp.now();
+    const lastActive = otherUser?.lastActive;
+    const differenceInMinutes = (now.toMillis() - lastActive?.toMillis()) / (1000 * 60);
+
+    console.log(differenceInMinutes)
+
+
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];

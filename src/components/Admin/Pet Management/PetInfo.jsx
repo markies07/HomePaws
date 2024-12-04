@@ -208,7 +208,7 @@ function PetInfo() {
                         <p className='font-semibold text-lg text-center py-2 pb-5'>Owner's Information</p>
                         <div className='flex flex-col gap-2'>
                             <p className='flex items-center font-semibold gap-3'><img className='w-6' src={pic} alt="" />Full Name</p>
-                            <p>{pet.ownerName}</p>
+                            <p>{pet.ownerFirstName} {pet.ownerMI} {pet.ownerLastName}</p>
                         </div>
                         <div className='w-full my-3'>
                             <div className='h-[1px] w-full relative bg-[#a1a1a1]'></div>

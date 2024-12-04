@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useId, useState } from "react";
 import { db } from "../../firebase/firebase";
-import { doc, writeBatch, increment, serverTimestamp, collection, where, getDocs, query, getDoc, setDoc, updateDoc, orderBy } from "firebase/firestore";
+import { Timestamp, doc, writeBatch, increment, serverTimestamp, collection, where, getDocs, query, getDoc, setDoc, updateDoc, orderBy } from "firebase/firestore";
 import { notifyErrorOrange, notifySuccessOrange } from "./CustomToast";
 import defaultPic from '../../assets/icons/default-profile.svg';
 import { AuthContext } from "./AuthProvider";
+import emailjs from '@emailjs/browser';
 
 const LikesAndCommentsContext = createContext();
 
@@ -86,6 +87,7 @@ export const LikesAndCommentsProvider = ({children}) => {
                         otherUserCount, // Keep track of how many others have liked
                         senderName: likerName, // Update to show only the latest user who liked the post
                         image: userData.profilePictureURL,
+                        isRead: false,
                         timestamp: serverTimestamp(),
                     });
                 } else {
@@ -186,6 +188,27 @@ export const LikesAndCommentsProvider = ({children}) => {
         }
     };
 
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail) => {
+        try {
+            const templateParams = {
+                subject: `${userData.fullName} commented on your post in HomePaws`,
+                message: `click here: https://paws-ae1eb.web.app/`,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
+
 
     // HANDLING COMMENT
     const handleComment = async (postId, userId, commentText) => {
@@ -244,6 +267,25 @@ export const LikesAndCommentsProvider = ({children}) => {
                         // 2 or fewer comments, just show the senderName
                         newNotificationMessage = `commented on your post.`;
                     }
+
+                    // Fetch post owner's data
+                    const postOwnerRef = doc(db, 'users', postOwnerId);
+                    const postOwnerSnapshot = await getDoc(postOwnerRef);
+                    const postOwnerData = postOwnerSnapshot.data();
+
+                    // Check lastActive timestamp
+                    if (postOwnerData && postOwnerData.lastActive) {
+                        const now = Timestamp.now();
+                        const lastActive = postOwnerData.lastActive;
+                        const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                        if (differenceInMinutes >= 3) {
+                            // Send email notification if the post owner has been inactive for 3 minutes or more
+                            await sendEmailNotification(
+                                postOwnerData.email
+                            );
+                        }
+                    }
         
                     // Update the notification
                     await updateDoc(notificationRef, {
@@ -256,6 +298,25 @@ export const LikesAndCommentsProvider = ({children}) => {
                 } else {
                     // If no notification exists, create a new one
                     newNotificationMessage = `commented on your post.`;
+
+                    // Fetch post owner's data
+                    const postOwnerRef = doc(db, 'users', postOwnerId);
+                    const postOwnerSnapshot = await getDoc(postOwnerRef);
+                    const postOwnerData = postOwnerSnapshot.data();
+
+                    // Check lastActive timestamp
+                    if (postOwnerData && postOwnerData.lastActive) {
+                        const now = Timestamp.now();
+                        const lastActive = postOwnerData.lastActive;
+                        const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                        if (differenceInMinutes >= 3) {
+                            // Send email notification if the post owner has been inactive for 3 minutes or more
+                            await sendEmailNotification(
+                                postOwnerData.email
+                            );
+                        }
+                    }
         
                     await setDoc(notificationRef, {
                         type: 'comment',

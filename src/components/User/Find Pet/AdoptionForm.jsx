@@ -5,6 +5,7 @@ import { addDoc, collection, doc, getDoc, serverTimestamp, Timestamp, updateDoc 
 import { db } from '../../../firebase/firebase';
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
 import { AuthContext } from '../../General/AuthProvider';
+import emailjs from '@emailjs/browser';
 
 function AdoptionForm() {
     const { petID } = useParams();
@@ -55,6 +56,27 @@ function AdoptionForm() {
         }
     }, [pet, userData]);
 
+    // Function to send email notifications using EmailJS
+    const sendEmailNotification = async (recipientEmail) => {
+        try {
+            const templateParams = {
+                subject: `You got an adoption application!`,
+                message: `${userData.fullName} submitted an adoption application.\nclick here: https://paws-ae1eb.web.app/`,
+                email: recipientEmail
+            };
+
+            // Replace these with your EmailJS credentials
+            const SERVICE_ID = 'service_yii1sji';
+            const TEMPLATE_ID = 'template_eti1vex';
+            const USER_ID = 'JT0EGxZqCSR3-9IIa';
+
+            await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID);
+            console.log(`Email notification sent to ${recipientEmail}`);
+        } catch (error) {
+            console.error('Failed to send email notification: ', error);
+        }
+    };
+
     // SUBMITTING APPLICATION
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -77,6 +99,25 @@ function AdoptionForm() {
             await updateDoc(docRef, {
                 applicationID: docRef.id,
             });
+
+            // Fetch post owner's data
+            const petOwnerRef = doc(db, 'users', pet.userID);
+            const petOwnerSnapshot = await getDoc(petOwnerRef);
+            const petOwnerData = petOwnerSnapshot.data();
+
+            // Check lastActive timestamp
+            if (petOwnerData && petOwnerData.lastActive) {
+                const now = Timestamp.now();
+                const lastActive = petOwnerData.lastActive;
+                const differenceInMinutes = (now.toMillis() - lastActive.toMillis()) / (1000 * 60);
+
+                if (differenceInMinutes >= 3) {
+                    // Send email notification if the post owner has been inactive for 3 minutes or more
+                    await sendEmailNotification(
+                        petOwnerData.email
+                    );
+                }
+            }
 
             const notificationRef = collection(db, 'notifications');
             await addDoc(notificationRef, {

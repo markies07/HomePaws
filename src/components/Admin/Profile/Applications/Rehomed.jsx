@@ -41,41 +41,25 @@ function Rehomed() {
       try {
         const rehomedPetsRef = collection(db, 'rehomedPets');
         
-        // Query where the user is the adopter
-        const adopterQuery = query(
-          rehomedPetsRef,
-          where('adopterUserID', '==', user.uid),
-          orderBy('timestamp', 'desc')
-        );
-  
-        // Query where the user is the previous owner
+        // Query only where the user is the previous owner
         const ownerQuery = query(
           rehomedPetsRef,
           where('ownerUserID', '==', user.uid),
           orderBy('timestamp', 'desc')
         );
   
-        const [adopterSnapshot, ownerSnapshot] = await Promise.all([
-          getDocs(adopterQuery),
-          getDocs(ownerQuery)
-        ]);
-  
-        const adopterPets = adopterSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const ownerSnapshot = await getDocs(ownerQuery);
   
         const ownerPets = ownerSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-
+  
         // Fetch profiles for all unique adopters
-        const allPets = [...adopterPets, ...ownerPets];
-        const uniqueAdopters = [...new Set(allPets.map(pet => pet.adopterUserID))];
+        const uniqueAdopters = [...new Set(ownerPets.map(pet => pet.adopterUserID))];
         await Promise.all(uniqueAdopters.map(adopterId => fetchAdopterProfile(adopterId)));
   
-        setRehomedPets(allPets);
+        setRehomedPets(ownerPets);
       } catch (error) {
         console.error('Error fetching rehomed pets: ', error);
       } finally {
@@ -114,22 +98,9 @@ function Rehomed() {
     }
   };
 
-  const filteredPets = rehomedPets.filter((pet) => {
-    if (filter === 'Adoptee') {
-        return pet.adopterUserID === user.uid;
-    }
-    if (filter === 'Adopter') {
-      return pet.ownerUserID === user.uid;
-    }
-    return true;
-  });
-  
   const renderRehomedPet = (pet) => {
-    const isAdopter = pet.ownerUserID === user.uid;
-    const displayName = pet.adopterUserID === user.uid 
-      ? 'You' 
-      : (adopterNames[pet.adopterUserID] || 'Unknown User');
-
+    const displayName = adopterNames[pet.adopterUserID] || 'Unknown User';
+  
     return (
       <div 
         onClick={() => navigate(`/admin/profile/applications/rehomed/${pet.rehomedID}`)} 
@@ -156,25 +127,16 @@ function Rehomed() {
     <div>
       <p className='text-lg font-semibold pt-1 sm:pt-0 sm:text-xl'>Rehomed Pets</p>
 
-      <div className='flex mb-3 sm:mb-4 mt-2 gap-1'>
-        {['All', 'Adoptee', 'Adopter'].map(buttonText => (
-          <button
-            key={buttonText}
-            onClick={() => setFilter(buttonText)}
-            className={`text-xs sm:text-sm font-medium px-2 sm:px-3 cursor-pointer py-1 ${filter === buttonText ? 'bg-primary rounded-md text-white' : ''}`}>
-            {buttonText}
-          </button>
-        ))}
-      </div>
-
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-2 mt-3'>
         {loading ? (
           <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">
             Loading...
           </div>
         ) : (
-          filteredPets.length > 0 ? (
-            filteredPets.map(renderRehomedPet)
+          rehomedPets.length > 0 ? (
+            <div className='flex flex-col gap-2'>
+              {rehomedPets.map(renderRehomedPet)}
+            </div>
           ) : (
             <div className="text-center bg-secondary relative items-center shadow-custom w-full p-5 rounded-lg font-medium">
               No Rehomed Pets Found
