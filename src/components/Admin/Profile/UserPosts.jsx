@@ -12,7 +12,9 @@ import deletePost from './assets/delete.svg'
 import close from './assets/small-close.svg'
 import settings from './assets/settings.svg'
 import { confirm } from '../../General/CustomAlert';
+import editPost from '../News Feed/assets/edit.svg'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
+import EditPost from './EditPost';
 
 function UserPosts() {
     const {user, userData} = useContext(AuthContext);
@@ -22,6 +24,7 @@ function UserPosts() {
     const { handleLike, handleUnlike, handleComment } = useLikesAndComments();
     const [isCommentOpen, setIsCommentOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const { showModal } = useImageModal();
 
@@ -125,6 +128,17 @@ function UserPosts() {
         }  
     }
 
+    const openEdit = (postID) => {
+        setIsEditOpen(!isEditOpen);
+        setSelectedPost(postID);
+    }
+
+    const closeEdit = () => {
+        setIsEditOpen(!isEditOpen);
+        setSelectedPost(null);
+        setIsSettingsOpen(null);
+    }
+
     const deleteThisPost = async (postID) => {
         confirm(`Deleting Post`, `Are you sure you want to delete this post?`).then(async (result) => {
             if(result.isConfirmed){
@@ -175,6 +189,10 @@ function UserPosts() {
                                 <div onClick={() => deleteThisPost(post.id)} className='px-5 flex py-2 cursor-pointer hover:bg-[#e6e6e6] duration-150 items-center gap-3'>
                                     <img className='w-[22px]' src={deletePost} alt="" />
                                     <p className='font-medium'>Delete Post</p>
+                                </div>
+                                <div onClick={() => openEdit(post.id)} style={{display: post.userID === user.uid ? 'flex' : 'none'}} className='px-5 py-2 cursor-pointer hover:bg-[#e6e6e6] duration-150 items-center gap-3'>
+                                    <img className='w-[22px]' src={editPost} alt="" />
+                                    <p className='font-medium'>Edit Post</p>
                                 </div>
                             </div>
                             
@@ -233,6 +251,11 @@ function UserPosts() {
 
                             <div className={isCommentOpen ? 'block' : 'hidden'}>
                                 <Comments postID={selectedPost} handleComment={handleComment} closeComment={closeComment} other={true} />
+                            </div>
+
+                            {/* EDIT POST */}
+                            <div className={isEditOpen ? 'block' : 'hidden'}>
+                                <EditPost postId={selectedPost} closeEdit={closeEdit} />
                             </div>
                         </div>
                     )

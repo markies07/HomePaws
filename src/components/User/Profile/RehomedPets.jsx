@@ -220,7 +220,7 @@ function RehomedPets() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Pet Owner:</p>
-                                    <p>{data?.petDetails?.ownerFirstName} {data?.petDetails?.ownerMI} {data?.petDetails?.ownerLastName}</p>
+                                    <p className='capitalize'>{data?.petDetails?.ownerFirstName} {data?.petDetails?.ownerMI} {data?.petDetails?.ownerLastName}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Full Address:</p>
@@ -247,7 +247,7 @@ function RehomedPets() {
                                     <div className='w-full flex flex-col gap-2'>
                                         <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                             <p className='font-semibold'>Full Name:</p>
-                                            <p>{data?.adopterDetails?.adopterFirstName} {data?.adopterDetails?.ownerMI} {data?.adopterDetails?.ownerLastName}</p>
+                                            <p className='capitalize'>{data?.adopterDetails?.adopterFirstName} {data?.adopterDetails?.adopterMI} {data?.adopterDetails?.adopterLastName}</p>
                                         </div>
                                         <div className='flex gap-2'>
                                             <div className='bg-secondary w-[30%] shadow-custom p-2 sm:p-3 rounded-md'>
@@ -262,12 +262,12 @@ function RehomedPets() {
                                     </div>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Full Address:</p>
-                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
+                                    <p className='font-semibold'>Occupation:</p>
+                                    <p>{data?.adopterDetails?.adopterOccupation}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Commitment:</p>
-                                    <p>{data?.adopterDetails?.adopterCommitment}</p>
+                                    <p className='font-semibold'>Full Address:</p>
+                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>

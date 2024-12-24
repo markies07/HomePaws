@@ -7,6 +7,7 @@ import { db, storage } from '../../../firebase/firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid'
+import closewhite from '../assets/close.svg'
 
 const MAX_IMAGES = 3;
 
@@ -105,7 +106,10 @@ function CreatePost({closeWindow, postType}) {
         setIsLoading(false);
     }
 
-    
+    const handleRemoveImage = (index) => {
+        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    };    
+
 
 
     return (
@@ -121,12 +125,19 @@ function CreatePost({closeWindow, postType}) {
                     {/* IMAGE THAT WILL UPLOAD */}
                     <div className='rounded-md relative flex-grow flex justify-center flex-col items-center bg-[#D9D9D9] overflow-hidden'>
                         <input id='images' className='hidden' type="file" accept='image/*' multiple onChange={handleImageChange} />
-                        <p onClick={() => document.getElementById('images').click()} className='absolute bottom-4 bg-[#7E7E7E] text-sm rounded-md cursor-pointer hover:bg-[#6e6e6e] duration-150 right-4 text-white px-3 py-1'>Upload Images</p>
+                        <p onClick={() => document.getElementById('images').click()} className='absolute bottom-4 bg-[#7E7E7E] text-sm rounded-md cursor-pointer hover:bg-[#6e6e6e] duration-150 right-4 text-white z-40 px-3 py-1'>Upload Images</p>
                         {images.length > 0 ? (
-                            <div className='flex gap-2 w-full h-full items-center object-cover px-2'>
+                            <div className='flex gap-2 w-full h-[70%] items-center justify-center object-cover px-2'>
                                 {images.map((image, index) => (
-                                    <div className='' key={index}>
-                                        <img className='object-cover rounded-md' alt={`preview-${index}`} src={URL.createObjectURL(image)} />
+                                    <div className='relative flex items-center w-full h-full' key={index}>
+                                        <img className='object-cover w-full h-full rounded-md' alt={`preview-${index}`} src={URL.createObjectURL(image)} />
+                                        {/* Remove Button */}
+                                        <button
+                                            onClick={() => handleRemoveImage(index)}
+                                            className='absolute top-1 right-1 bg-primary text-white text-xs rounded-full p-2'
+                                        >
+                                            <img className='w-5 h-5' src={closewhite} alt="" />
+                                        </button>
                                     </div>
                                 ))}
                             </div>

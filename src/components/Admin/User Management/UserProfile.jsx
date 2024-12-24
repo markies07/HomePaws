@@ -3,16 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../General/AuthProvider';
 import { useLikesAndComments } from '../../General/LikesAndCommentsContext';
 import { useImageModal } from '../../General/ImageModalContext';
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, addDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import unlike from './assets/unlike.svg'
 import like from './assets/like.svg'
 import comment from './assets/comment.svg'
 import Comments from '../../User/News Feed/Comments';
 import Actions from './Actions';
-import BanUser from './BanUser';
-import DeactivateUser from './DeactivateUser';
-import admins from './assets/white-admins.svg'
 import message from './assets/message.svg';
 import actions from './assets/actions.svg';
 
@@ -29,10 +26,7 @@ function UserProfile() {
     const { handleLike, handleUnlike, handleComment } = useLikesAndComments();
     const [isCommentOpen, setIsCommentOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const { showModal } = useImageModal();
-    const [isReportOpen, setIsReportOpen] = useState(false);
-    const [isReportUser, setIsReportUser] = useState(false);
 
     // FETCHING USER DATA
     useEffect(() => {
@@ -150,31 +144,6 @@ function UserProfile() {
           return `${seconds} seconds ago`;
         }
     };
-
-
-    const toggleSettings = (postID) => {
-        if(isSettingsOpen === postID){
-            setIsSettingsOpen(null);
-        }
-        else{
-            setIsSettingsOpen(postID);
-        }  
-    }
-
-    // OPEN REPORT
-    const openReport = (postID) => {
-        setIsReportOpen(!isReportOpen);
-        setSelectedPost(postID);
-    }
-    const closeReport = () => {
-        setIsReportOpen(!isReportOpen);
-        setSelectedPost(null);
-        setIsSettingsOpen(null);
-    }
-
-    const openReportUser = () => {
-        setIsReportUser(!isReportUser);
-    }
     
 
     // MESSAGING EACH OTHER
@@ -205,7 +174,7 @@ function UserProfile() {
             })
             chatID = newChatRef.id;
         }
-        navigate(`/dashboard/chat/convo/${chatID}`);
+        navigate(`/admin/chat/convo/${chatID}`);
     }
 
     const toggleAction = () => {
@@ -224,7 +193,7 @@ function UserProfile() {
                     <div className='flex flex-col md:items-start md:ml-5'>
                         <p className='font-medium text-xl text-center leading-3 mb-4 md:mb-1 md:text-2xl md:text-start'>{data.fullName}</p>
                         <div className='text-white text-xs flex justify-center gap-1 flex-wrap'>
-                            <p className={`${data.role === 'admin' ? 'block' : 'hidden'} text-xs bg-text rounded-full text-white px-2 py-1`}>admin</p>
+                            <p className={`${data.role === 'admin' ? 'block' : 'hidden'} text-xs bg-text rounded-full text-white px-2 py-1`}>Admin</p>
                             <p className={`bg-primary py-1 px-3 rounded-full whitespace-nowrap ${data.petOwnerType !== 'Both' ? 'block' : 'hidden'}`}>{data.petOwnerType}</p>
                             <div className={data.petOwnerType === 'Both' ? 'flex gap-1' : 'hidden'}>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
@@ -237,14 +206,14 @@ function UserProfile() {
 
                 {/* ACTIONS MOBILE */}
                 <div className='absolute md:hidden top-3 right-3 flex flex-col gap-2'>
-                    <button onClick={toggleAction} className=' bg-text rounded-md hover:bg-[#707070] duration-150'><img className='w-9 p-2' src={actions} alt="" /></button>
-                    <button className=' bg-[#8FBB3E] rounded-md hover:bg-[#7ea534] duration-150'><img className='w-9 p-2' src={message} alt="" /></button>
+                    <button onClick={toggleAction} className={`${data.role === 'admin' && userData.role != 'superadmin' ? 'hidden' : 'block'} bg-text rounded-md hover:bg-[#707070] duration-150`}><img className='w-9 p-2' src={actions} alt="" /></button>
+                    <button onClick={() => handleStartChat(data.uid)} className=' bg-[#8FBB3E] rounded-md hover:bg-[#7ea534] duration-150'><img className='w-9 p-2' src={message} alt="" /></button>
                 </div>
 
                 {/* ACTIONS DESKTOP */}
                 <div className='self-start hidden md:flex justify-end relative w-full gap-2 mt-2 md:mt-0'>
-                    <button className='bg-[#8FBB3E] flex hover:bg-[#7ea534] items-center gap-2 sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'> <img className='w-5' src={message} alt="" /> MESSAGE <br className='sm:hidden' /> USER</button>
-                    <button onClick={toggleAction} className=' bg-text rounded-md hover:bg-[#707070] duration-150'><img className='w-9 p-2' src={actions} alt="" /></button>
+                    <button onClick={() => handleStartChat(data.uid)} className='bg-[#8FBB3E] flex hover:bg-[#7ea534] items-center gap-2 sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'> <img className='w-5' src={message} alt="" /> MESSAGE <br className='sm:hidden' /> USER</button>
+                    <button onClick={toggleAction} className={`${data.role === 'admin' && userData.role != 'superadmin' ? 'hidden' : 'block'} bg-text rounded-md hover:bg-[#707070] duration-150`}><img className='w-9 p-2' src={actions} alt="" /></button>
                 </div>
 
                 {/* ACTION WINDOW */}

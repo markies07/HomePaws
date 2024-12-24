@@ -18,6 +18,8 @@ import close from './assets/close.svg'
 import Report from './Report'
 import { confirm } from '../../General/CustomAlert'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast'
+import editPost from './assets/edit.svg'
+import EditPost from './EditPost'
 
 
 function Posts() {
@@ -29,6 +31,7 @@ function Posts() {
     const [likedPosts, setLikedPosts] = useState({});
     const [isCommentOpen, setIsCommentOpen] = useState(false);
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const navigate = useNavigate();
@@ -107,6 +110,17 @@ function Posts() {
     }
     const closeReport = () => {
         setIsReportOpen(!isReportOpen);
+        setSelectedPost(null);
+        setIsSettingsOpen(null);
+    }
+
+    const openEdit = (postID) => {
+        setIsEditOpen(!isEditOpen);
+        setSelectedPost(postID);
+    }
+
+    const closeEdit = () => {
+        setIsEditOpen(!isEditOpen);
         setSelectedPost(null);
         setIsSettingsOpen(null);
     }
@@ -207,6 +221,10 @@ function Posts() {
                                     <img className='w-[22px]' src={deletePost} alt="" />
                                     <p className='font-medium'>Delete Post</p>
                                 </div>
+                                <div onClick={() => openEdit(post.id)} style={{display: post.userID === user.uid ? 'flex' : 'none'}} className='px-5 py-2 cursor-pointer hover:bg-[#e6e6e6] duration-150 items-center gap-3'>
+                                    <img className='w-[22px]' src={editPost} alt="" />
+                                    <p className='font-medium'>Edit Post</p>
+                                </div>
                             </div>
 
                             
@@ -268,6 +286,11 @@ function Posts() {
 
                             <div className={isCommentOpen ? 'block' : 'hidden'}>
                                 <Comments postID={selectedPost} handleComment={handleComment} closeComment={closeComment} />
+                            </div>
+
+                            {/* EDIT POST */}
+                            <div className={isEditOpen ? 'block' : 'hidden'}>
+                                <EditPost postId={selectedPost} closeEdit={closeEdit} />
                             </div>
 
                             {/* REPORT */}

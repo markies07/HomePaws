@@ -128,7 +128,7 @@ function RehomeInfo() {
     }
 
     return (
-        <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-56 lg:ml-3 xl:pl-[13.8rem] lg:pr-[13px] sm:px-3 min-h-screen flex flex-col font-poppins text-text'>
+        <div className='pt-[9.75rem] relative lg:pt-[5.75rem] lg:pl-56 lg:ml-3 lg:pr-[13px] sm:px-3 min-h-screen flex flex-col font-poppins text-text'>
             <div className='bg-secondary flex flex-col mb-3 pt-3 overflow-hidden flex-grow sm:pt-5 relative w-full shadow-custom h-full sm:rounded-md lg:rounded-lg'>
                 <img onClick={() => navigate('/admin/pet-management')} className='w-9 p-1 border-2 border-transparent hover:border-text duration-150 absolute top-2 right-2 cursor-pointer' src={close} alt="" />
                 <p className='text-2xl text-center sm:text-start pt-6 px-3 sm:px-5 font-semibold sm:pt-0'>Rehomed Pet</p>
@@ -256,12 +256,12 @@ function RehomeInfo() {
                                     </div>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Full Address:</p>
-                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
+                                    <p className='font-semibold'>Occupation:</p>
+                                    <p>{data?.adopterDetails?.adopterOccupation}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Commitment:</p>
-                                    <p>{data?.adopterDetails?.adopterCommitment}</p>
+                                    <p className='font-semibold'>Full Address:</p>
+                                    <p>{data?.adopterDetails?.houseNo} {data?.adopterDetails?.barangay} {data?.adopterDetails?.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>

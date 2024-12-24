@@ -34,7 +34,7 @@ function Header() {
         <div className='fixed top-0 z-20 bg-secondary w-full p-3 px-5 md:px-7 justify-between flex h-20 lg:drop-shadow-md'>
             <img onClick={() => navigate('/dashboard/pet-management')} className='w-36 cursor-pointer sm:w-40 object-contain -ml-1 sm:ml-0' src={logo} alt="" />
             <div className='flex relative justify-center items-center'>
-                <p className='font-medium pr-2'>Admin |</p>
+                <p className='font-medium pr-2 hidden sm:block'>{userData.role === 'admin' ? 'Admin |' : 'Super Admin |'}</p>
                 <img onClick={handleLogoutClick} className='w-12 h-12 object-cover bg-text border-2 border-secondary hover:border-primary duration-150 cursor-pointer rounded-full' src={userData?.profilePictureURL} alt="HAHAH" />
                 <div style={{display: isLogoutOpen ? 'block' : 'none'}}
                 className='absolute z-50 duration-150 font-poppins top-16 lg:top-20 right-0 bg-secondary overflow-hidden rounded-lg text-text shadow-[1px_1px_15px_2px_rgb(0,0,0,.12)]'>

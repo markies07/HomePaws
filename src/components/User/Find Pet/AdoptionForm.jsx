@@ -6,6 +6,9 @@ import { db } from '../../../firebase/firebase';
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast';
 import { AuthContext } from '../../General/AuthProvider';
 import emailjs from '@emailjs/browser';
+import check from './assets/check.svg';
+import uncheck from './assets/uncheck.svg';
+import TermsAndConditions from './TermsAndConditions';
 
 function AdoptionForm() {
     const { petID } = useParams();
@@ -13,7 +16,48 @@ function AdoptionForm() {
     const navigate = useNavigate();
     
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
+    const [isAccepted, setIsAccepted] = useState(false);
     const [pet, setPet] = useState([]);
+
+    const barangayOptions = {
+        'General Trias': [
+            'Alingaro',
+            'Arnaldo Poblacion',
+            'Bacao I',
+            'Bacao II',
+            'Bagumbayan Poblacion',
+            'Buenavista I',
+            'Buenavista II',
+            'Buenavista III',
+            'Corregidor Poblacion',
+            'Dulong Bayan Poblacion',
+            'Gov. Ferrer Poblacion',
+            'Javalera',
+            'Manggahan',
+            'Navarro',
+            'Ninety Sixth Poblacion',
+            'Panungyanan',
+            'Pasong Camachile I',
+            'Pasong Camachile II',
+            'Pasong Kawayan I',
+            'Pasong Kawayan II',
+            'Pinagtipunan',
+            'Prinza Poblacion',
+            'Sampalucan Poblacion',
+            'San Francisco',
+            'San Gabriel Poblacion',
+            'San Juan I',
+            'San Juan II',
+            'Santa Clara',
+            'Santiago',
+            'Tapia',
+            'Tejero',
+            'Vibora Poblacion',
+        ],
+    };
+    
+
     const [formData, setFormData] = useState({
         adopterFirstName: '',
         adopterLastName: '',
@@ -24,7 +68,7 @@ function AdoptionForm() {
         gender: 'Male',
         contactNumber: '',
         emailAddress: '',
-        municipality: '',
+        municipality: 'Alfonso',
         barangay: '',
         houseNo: '',
         reasonForAdopting: '',
@@ -32,8 +76,15 @@ function AdoptionForm() {
         typeOfResidence: 'House',
         occupation: '',
         salaryRange: 'Less than Php 10,000',
-        commitment: '', 
     });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -41,6 +92,21 @@ function AdoptionForm() {
             [e.target.name]: e.target.value
         });
     }
+
+    // Dynamically update barangay when municipality changes
+    useEffect(() => {
+        if (formData.municipality === 'General Trias') {
+            setFormData((prevState) => ({
+                ...prevState,
+                barangay: barangayOptions['General Trias'][0], // Default to the first barangay
+            }));
+        } else {
+            setFormData((prevState) => ({
+                ...prevState,
+                barangay: '', // Reset barangay if not General Trias
+            }));
+        }
+    }, [formData.municipality]);
 
     useEffect(() => {
         if (pet && userData) {
@@ -82,6 +148,12 @@ function AdoptionForm() {
         e.preventDefault();
 
         setIsSubmitting(true);
+
+        if(!isAccepted) {
+            notifyErrorOrange('You need to accept terms and conditions');
+            setIsSubmitting(false);
+            return;
+        }
 
         if(formData.contactNumber.length !== 11){
             notifyErrorOrange('Please enter a valid contact number.');
@@ -169,6 +241,10 @@ function AdoptionForm() {
           fetchPetData();
         }
     }, [petID]);
+
+    const toggleTerms = () => {
+        setIsTermsOpen(!isTermsOpen);
+    }
 
 
     return (
@@ -260,49 +336,29 @@ function AdoptionForm() {
                             </select>
                         </div>
 
-                        <div className={`${formData.municipality === 'General Trias' ? 'block' : 'hidden'} w-full gap-3 pb-2`}>
-                            <p className='font-semibold'>Barangay</p>
-                            <select name="barangay" value={formData.barangay} onChange={handleChange} className="border-text rounded-md sm:text-base w-full py-1 px-1 outline-none font-medium text-text border-2">
-                                <option className="text-text py-2" value="Alingaro">Alingaro</option>
-                                <option className="text-text py-2" value="Arnaldo Poblacion">Arnaldo Poblacion</option>
-                                <option className="text-text py-2" value="Bacao I">Bacao I</option>
-                                <option className="text-text py-2" value="Bacao II">Bacao II</option>
-                                <option className="text-text py-2" value="Bagumbayan Poblacion">Bagumbayan Poblacion</option>
-                                <option className="text-text py-2" value="Biclatan">Biclatan</option>
-                                <option className="text-text py-2" value="Buenavista I">Buenavista I</option>
-                                <option className="text-text py-2" value="Buenavista II">Buenavista II</option>
-                                <option className="text-text py-2" value="Buenavista III">Buenavista III</option>
-                                <option className="text-text py-2" value="Corregidor Poblacion">Corregidor Poblacion</option>
-                                <option className="text-text py-2" value="Dulong Bayan Poblacion">Dulong Bayan Poblacion</option>
-                                <option className="text-text py-2" value="Gov. Ferrer Poblacion">Gov. Ferrer Poblacion</option>
-                                <option className="text-text py-2" value="Javalera">Javalera</option>
-                                <option className="text-text py-2" value="Manggahan">Manggahan</option>
-                                <option className="text-text py-2" value="Navaro">Navaro</option>
-                                <option className="text-text py-2" value="Ninety Sixth Poblacion">Ninety Sixth Poblacion</option>
-                                <option className="text-text py-2" value="Panungyanan">Panungyanan</option>
-                                <option className="text-text py-2" value="Pasong Camachile I">Pasong Camachile I</option>
-                                <option className="text-text py-2" value="Pasong Camachile II">Pasong Camachile II</option>
-                                <option className="text-text py-2" value="Pasong Kawayan I">Pasong Kawayan I</option>
-                                <option className="text-text py-2" value="Pasong Kawayan II">Pasong Kawayan II</option>
-                                <option className="text-text py-2" value="Pinagtipunan">Pinagtipunan</option>
-                                <option className="text-text py-2" value="Prinza Poblacion">Prinza Poblacion</option>
-                                <option className="text-text py-2" value="Sampalucan Poblacion">Sampalucan Poblacion</option>
-                                <option className="text-text py-2" value="San Francisco">San Francisco</option>
-                                <option className="text-text py-2" value="San Gabriel Poblacion">San Gabriel Poblacion</option>
-                                <option className="text-text py-2" value="San Juan I">San Juan I</option>
-                                <option className="text-text py-2" value="San Juan II">San Juan II</option>
-                                <option className="text-text py-2" value="Santa Clara">Santa Clara</option>
-                                <option className="text-text py-2" value="Santiago">Santiago</option>
-                                <option className="text-text py-2" value="Tapia">Tapia</option>
-                                <option className="text-text py-2" value="Tejero">Tejero</option>
-                                <option className="text-text py-2" value="Vibora Poblacion">Vibora Poblacion</option>
-                            </select>
-                        </div>
-
-                        <div className={`${formData.municipality === 'General Trias' ? 'hidden' : 'block'} w-full gap-3 pb-2`}>
-                            <p className='font-semibold'>Barangay</p>
-                            <input name="barangay" value={formData.barangay} onChange={handleChange} required className='py-1 outline-none capitalize w-full px-2 border-2 border-text rounded-md' type="text" />
-                        </div>
+                        {/* Barangay Section */}
+                        {formData.municipality === 'General Trias' ? (
+                            <div className="w-full gap-3 pb-2">
+                                <p className="font-semibold">Barangay</p>
+                                <select
+                                    name="barangay"
+                                    value={formData.barangay}
+                                    onChange={handleInputChange}
+                                    className="border-text rounded-md sm:text-base w-full py-1 px-1 outline-none font-medium text-text border-2"
+                                >
+                                    {barangayOptions['General Trias'].map((barangay) => (
+                                        <option className="text-text py-2" key={barangay} value={barangay}>
+                                            {barangay}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div className={`${formData.municipality === 'General Trias' ? 'hidden' : 'block'} w-full gap-3 pb-2`}>
+                                <p className='font-semibold'>Barangay</p>
+                                <input name="barangay" value={formData.barangay} onChange={handleChange} required className='py-1 outline-none capitalize w-full px-2 border-2 border-text rounded-md' type="text" />
+                            </div>
+                        )}
 
                         <div className='w-full gap-3 pb-2'>
                             <p className='font-semibold'>St. Name, Building, House No.</p>
@@ -353,16 +409,22 @@ function AdoptionForm() {
                             </select>
                         </div>
                     </div>
-                    <div className='w-full flex gap-2 pb-4'>
-                        <div className='w-full'>
-                            <p className='font-semibold'>Commitment</p>
-                            <textarea required name="commitment" value={formData.commitment || ''} onChange={handleChange} className='py-1 w-full h-20 px-2 border-2 border-text rounded-md' placeholder='(e.g., Prove that you will take care of the pet.)'></textarea>
+                    <div className='w-full flex pb-5 pt-3'>
+                        <div className='w-full gap-2 flex justify-center'>
+                            <img className='w-7 h-7 object-cover' src={isAccepted ? check : uncheck} alt="" />
+                            <p onClick={toggleTerms} className='font-semibold text-lg text-text underline cursor-pointer'>Read Terms and Conditions</p>
                         </div>
                     </div>
                     <div className='flex justify-center py-3'>
-                        <button type='submit' disabled={isSubmitting} className='bg-primary hover:bg-primaryHover duration-150 py-2 px-3 font-medium text-white rounded-md'>{isSubmitting ? 'Submitting' : 'Submit Application'}</button>
+                        <button type='submit' disabled={isSubmitting} className='bg-primary hover:bg-primaryHover text-center duration-150 py-2 px-3 font-medium text-white rounded-md'>{isSubmitting ? 'Submitting' : 'Submit Application'}</button>
                     </div>
                 </form>
+
+                {/* TERMS AND CONDITIONS */}
+                <div className={isTermsOpen ? 'block' : 'hidden'}>
+                    < TermsAndConditions setIsAccepted={setIsAccepted} closeTerms={toggleTerms} />
+                </div>
+
             </div>
         </div>
     )

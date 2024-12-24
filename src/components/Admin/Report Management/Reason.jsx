@@ -143,6 +143,7 @@ function Reason() {
                     await updateDoc(reportRef, {
                         status: action, // set status to 'approved' or 'declined'
                         actionAt: serverTimestamp(),
+                        reviewedBy: userData.fullName
                     });
         
                     await addDoc(collection(db, 'notifications'), {
@@ -246,10 +247,10 @@ function Reason() {
                                 {/* POST REPORTED */}
                                 <div className={`${isUser ? 'hidden' : 'block'} bg-[#E9E9E9] md:rounded-lg p-5 sm:p-7 w-full`}>
                                     <p className='font-semibold mb-2'>Reported Post:</p>
-                                    <div className='flex flex-col mt-3 lg:mt-4 bg-secondary pt-6 py-4 px-5 md:px-7 sm:mx-auto lg:mx-0 mb-3 w-full text-text sm:w-[97%] lg:w-full rounded-lg shadow-custom'>
+                                    <div className='flex flex-col bg-secondary pt-6 py-4 px-5 md:px-7 sm:mx-auto lg:mx-0 mb-3 w-full text-text sm:w-[97%] lg:w-full rounded-lg shadow-custom'>
                                         {/* USER INFORMATION */}
                                         <div className='flex w-full relative'>
-                                            <img src={reported?.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] rounded-full' />
+                                            <img src={reported?.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] object-cover rounded-full' />
                                             <div className='ml-2'>
                                                 <p className='font-medium'>{post?.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post?.typeOfPost === 'story' ? '#A87CCD' : post?.typeOfPost === 'missing' ? '#ED5050' : '#85B728'}}>{post?.typeOfPost}</span></p>
                                                 <p className='-mt-[3px] text-xs'>{getTimeDifference(post?.createdAt)}</p>
@@ -288,7 +289,15 @@ function Reason() {
 
                                 {/* REASON */}
                                 <div className='bg-[#E9E9E9] md:rounded-lg p-5 sm:p-7 w-full'>
-                                    <p className='font-semibold mb-2'>Reported By:  {data?.reportedByName}</p>
+                                    <p className='font-semibold mb-1'>Reported By:  {data?.reportedByName}</p>
+                                    <p className='font-semibold mb-3'>
+                                        Date: {data?.reportedAt ? new Date(data.reportedAt.toDate()).toLocaleDateString('en-US', { 
+                                            month: 'long', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        }) : 'N/A'}
+                                    </p>
+
                                     <div className='bg-secondary shadow-custom relative w-full p-3 sm:px-5 rounded-lg flex flex-col'>
                                         <p className='font-semibold'>Reason: {data?.reason}</p>
                                         <p className=''>{data?.additionalDetails}</p>
@@ -301,9 +310,9 @@ function Reason() {
                                 <button onClick={() => handleReportAction('declined')} className='bg-[#D25A5A] hover:bg-[#c05050] duration-150 text-white px-4 py-2 rounded-md text-sm sm:text-base font-medium'>DECLINE</button>
                             </div>
 
-                            <div className={`${data?.status !== 'pending' ? 'flex' : 'hidden'} w-full pt-7 pb-5 xl:pt-10 justify-center`}>
-                                <p className={`${data?.status === 'approved' ? 'block' : 'hidden'} bg-[#84B725] px-5 py-2 rounded-full text-center font-medium text-white`}>This Report has been Approved</p>
-                                <p className={`${data?.status === 'declined' ? 'block' : 'hidden'} bg-[#D25A5A] px-5 py-2 rounded-full text-center font-medium text-white`}>This Report has been Declined</p>
+                            <div className={`${data?.status !== 'pending' ? 'flex' : 'hidden'} w-full py-8 px-5 xl:pt-10 justify-center`}>
+                                <p className={`${data?.status === 'approved' ? 'block' : 'hidden'} bg-[#84B725] px-5 py-2 rounded-full text-center leading-5 font-medium text-white`}>This report has been resolved by {data?.reviewedBy}</p>
+                                <p className={`${data?.status === 'declined' ? 'block' : 'hidden'} bg-[#D25A5A] px-5 py-2 rounded-full text-center leading-5 font-medium text-white`}>This report has been declined by {data?.reviewedBy}</p>
                             </div>
                         </>
                     )}

@@ -11,16 +11,16 @@ import {
   toggleLogin, closeLogin, 
   toggleCreate, closeCreate, 
   toggleIsLogin, closeIsLogin, 
-  toggleDog, closeDog 
+  toggleDog 
 } from '../../store/uiSlice';
 import { AuthContext } from '../General/AuthProvider'
 import { Navigate } from 'react-router-dom'
 import AboutUs from './AboutUs'
 import Feedbacks from './Feedbacks'
-import MeetTheTeam from './MeetTheTeam'
 import FAQs from './FAQs'
 import Rules from './Rules'
 import ContactUs from './ContactUs'
+import MeetTheTeam from './MeetTheTeam'
 
 function LandingPage() {
 
@@ -43,6 +43,7 @@ function LandingPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [petType, setPetType] = useState('');
   const [isFaqsOpen, setIsFaqsOpen] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
 
@@ -68,6 +69,10 @@ function LandingPage() {
     setIsContactOpen(!isContactOpen);
   }
 
+  const toggleCreator = () => {
+    setIsCreator(!isCreator);
+  }
+
   return (
     <div className='relative flex flex-col select-none font-poppins bg-secondary'>
       < ForAdoption petType={petType} isOpen={isOpen} closeUI={closeForAdoption} />
@@ -88,14 +93,16 @@ function LandingPage() {
       <div className={isContactOpen ? 'block' : 'hidden'}>
         < ContactUs closeContact={toggleContact} />
       </div>
-      <div className={`${isFaqsOpen || isRulesOpen ? 'hidden' : 'block'} relative bg-secondary`}>
+      <div className={isCreator ? 'block' : 'hidden'}>
+        < MeetTheTeam closeCreator={toggleCreator} />
+      </div>
+      <div className={`${isFaqsOpen || isRulesOpen || isCreator ? 'hidden' : 'block'} relative bg-secondary`}>
         {isLoginOpen && (<div onClick={() => dispatch(closeLogin())}  className='fixed inset-0 duration-150 bg-black opacity-50 z-20'></div>)}
         < Header onLoginClick={() => dispatch(toggleLogin())} />
         < Content open={openForAdoption} onLoginClick={() => dispatch(toggleLogin())} openDog={() => dispatch(toggleDog())}/>
         < AboutUs />
         < Feedbacks />
-        < MeetTheTeam />
-        < Footer openContact={toggleContact} openFaqs={toggleFaqs} openRules={toggleRules} />
+        < Footer openCreator={toggleCreator} openContact={toggleContact} openFaqs={toggleFaqs} openRules={toggleRules} />
       </div>
     </div>
   )

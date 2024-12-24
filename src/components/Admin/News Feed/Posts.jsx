@@ -12,12 +12,13 @@ import { db } from '../../../firebase/firebase'
 import Comments from './Comments'
 import { useImageModal } from '../../General/ImageModalContext'
 import { useNavigate } from 'react-router-dom'
-import reportPost from './assets/report.svg'
 import deletePost from './assets/delete.svg'
 import close from './assets/close.svg'
 import Report from './Report'
 import { confirm } from '../../General/CustomAlert'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast'
+import editPost from './assets/edit.svg'
+import EditPost from './EditPost'
 
 
 function Posts() {
@@ -29,6 +30,7 @@ function Posts() {
     const [likedPosts, setLikedPosts] = useState({});
     const [isCommentOpen, setIsCommentOpen] = useState(false);
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const navigate = useNavigate();
@@ -107,6 +109,17 @@ function Posts() {
     }
     const closeReport = () => {
         setIsReportOpen(!isReportOpen);
+        setSelectedPost(null);
+        setIsSettingsOpen(null);
+    }
+
+    const openEdit = (postID) => {
+        setIsEditOpen(!isEditOpen);
+        setSelectedPost(postID);
+    }
+
+    const closeEdit = () => {
+        setIsEditOpen(!isEditOpen);
         setSelectedPost(null);
         setIsSettingsOpen(null);
     }
@@ -207,6 +220,10 @@ function Posts() {
                                     <img className='w-[22px]' src={deletePost} alt="" />
                                     <p className='font-medium'>Delete Post</p>
                                 </div>
+                                <div onClick={() => openEdit(post.id)} style={{display: post.userID === user.uid ? 'flex' : 'none'}} className='px-5 py-2 cursor-pointer hover:bg-[#e6e6e6] duration-150 items-center gap-3'>
+                                    <img className='w-[22px]' src={editPost} alt="" />
+                                    <p className='font-medium'>Edit Post</p>
+                                </div>
                             </div>
 
                             
@@ -214,7 +231,7 @@ function Posts() {
                             <div className='flex pb-1 w-full'>
                                 <img src={post.userProfileImage} className='w-10 h-10 bg-[#D9D9D9] rounded-full object-cover' />
                                 <div className='ml-2'>
-                                    <p onClick={() => navigate(`/admin/profile/${post.userID}`)} className={`font-medium ${post.userID !== user.uid ? 'cursor-pointer' : 'pointer-events-none'}`}>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : post.typeOfPost === 'announcement' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
+                                    <p onClick={() => navigate(`/admin/user-management/profile/${post.userID}`)} className={`font-medium ${post.userID !== user.uid ? 'cursor-pointer' : 'pointer-events-none'}`}>{post.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post.typeOfPost === 'story' ? '#A87CCD' : post.typeOfPost === 'missing' ? '#ED5050' : post.typeOfPost === 'announcement' ? '#ED5050' : '#85B728'}}>{post.typeOfPost}</span></p>
                                     <p className='-mt-[3px] text-xs'>{getTimeDifference(post.createdAt)}</p>
                                 </div>
                             </div>
@@ -270,10 +287,16 @@ function Posts() {
                                 <Comments postID={selectedPost} handleComment={handleComment} closeComment={closeComment} />
                             </div>
 
+                            {/* EDIT POST */}
+                            <div className={isEditOpen ? 'block' : 'hidden'}>
+                                <EditPost postId={selectedPost} closeEdit={closeEdit} />
+                            </div>
+
                             {/* REPORT */}
                             <div className={isReportOpen ? 'block' : 'hidden'}>
                                 <Report postID={selectedPost} closeReport={closeReport} />
                             </div>
+
                         </div>
                     )
                 })

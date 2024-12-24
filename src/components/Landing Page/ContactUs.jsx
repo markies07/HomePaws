@@ -80,19 +80,6 @@ function ContactUs({closeContact}) {
 
                 <div className='px-5 sm:px-10 py-3 sm:py-7 flex flex-col w-full'>
 
-                    {/* LOCATION */}
-                    {/* <div className='md:order-2 md:w-[40%]'>
-                        <img className='w-full border-[1px] rounded-lg border-text' src={pic} alt="" />
-                        <p className='font-semibold text-center py-2'>Animal Pound Center</p>
-
-                        <div className='flex items-center gap-2 mt-2'>
-                            <img className='w-7 h-7' src={location} alt="" />
-                            <p className='text-lg font-semibold'>Location</p>
-                        </div>
-
-                        <p className='leading-5 py-1'>Bagong Kalsada, Brgy. Pasong Kawayan II, City of General Trias, Cavite</p>
-                    </div> */}
-
                     {/* MESSAGE FORM */}
                     <form ref={form} onSubmit={handleSubmit} className='bg-[#cccccc] w-full flex flex-col gap-2  p-4  rounded-lg'>
                         <div className='relative'>

@@ -83,12 +83,19 @@ function CreateAccount({ createOpen, createClose }) {
             email: userData.email,
             profilePictureURL,
             createdAt: new Date(),
+            role: 'user'
         });
     };
 
     const handleCreateAccount = async (e) => {
         e.preventDefault();
         console.log("Creating account...");
+
+        if(profilePicture === null) {
+            notifyErrorWhite("Add your profile picture!");
+            return;
+        }
+
         if (password !== confirmPassword) {
             notifyErrorWhite("Passwords don't match!");
             return;
@@ -111,7 +118,13 @@ function CreateAccount({ createOpen, createClose }) {
             notifyInfoWhite("Email verification email sent.");
         } catch (error) {
             console.error('Error creating account: ', error);
-            notifyErrorWhite("An error occurred. Please try again.");
+
+            if (error.code === 'auth/email-already-in-use') {
+                notifyErrorWhite("This account already exists!");
+            }
+            else{
+                notifyErrorWhite("An error occurred. Please try again.");
+            }
             setIsVerifying(false);
         }
     }

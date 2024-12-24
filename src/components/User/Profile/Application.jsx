@@ -269,12 +269,6 @@ function Application() {
                                 <p>{applicationData.salaryRange}</p>
                             </div>
                         </div>
-                        <div className='w-full flex gap-2 mb-2 sm:mb-3'>
-                            <div className='flex flex-col shadow-custom w-full leading-6 bg-secondary p-2 sm:p-3 lg:p-4 rounded-md'>
-                                <p className='font-semibold'>Commitment:</p>
-                                <p>{applicationData.commitment}</p>
-                            </div>
-                        </div>
                     </div>
 
                     {/* ACCEPT OR REJECT */}

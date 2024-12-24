@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import admin from './assets/admin-white.png';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { confirm, successAlert } from '../../General/CustomAlert';
+import { AuthContext } from '../../General/AuthProvider';
 
 function SetAdmin({data}) {
+
+    const {userData} = useContext(AuthContext);
 
     const changeRole = () => {
         if(data.role === 'user'){
@@ -51,7 +54,7 @@ function SetAdmin({data}) {
     }
 
     return (
-        <div className='w-full flex justify-center'>
+        <div className={`${userData.role === 'superadmin' ? 'flex' : 'hidden'} w-full justify-center`}>
             <button onClick={changeRole} className={`${data.role === 'user' ? 'flex' : 'hidden'} items-center text-sm bg-[#898989] hover:bg-[#6e6e6e] sm:w-60 sm:px-3 sm:whitespace-nowrap duration-150 py-2 text-white rounded-md w-full leading-3 font-medium`}><img className='w-8 mx-4 mr-5' src={admin} alt="" />SET AS ADMIN</button>
             <button onClick={changeRole} className={`${data.role === 'admin' ? 'flex' : 'hidden'} items-center text-sm bg-[#898989] hover:bg-[#6e6e6e] sm:w-60 sm:px-3 sm:whitespace-nowrap duration-150 py-2 text-white rounded-md w-full leading-3 font-medium`}><img className='w-8 mx-4 mr-5' src={admin} alt="" />DEMOTE AS ADMIN</button>
         </div>

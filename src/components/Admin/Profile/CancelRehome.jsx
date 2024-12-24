@@ -135,7 +135,7 @@ function CancelRehome({data, pet, closeCancel}) {
                 
                 {/* REASON OF REJECTION */}
                 <div className='pt-4 pb-11 flex-grow'>
-                    <p className='font-medium pb-1 text-lg'>Reason for canceling</p>
+                    <p className='font-medium pb-1 text-lg'>Reason for cancelation</p>
                     <textarea required onChange={(e) => setCancelReason(e.target.value)} value={cancelReason} className='py-2 mb-5 w-full h-full px-3 outline-none rounded-md' placeholder='State your reason...'></textarea>
                 </div>
                 

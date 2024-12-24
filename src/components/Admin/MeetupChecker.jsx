@@ -1,4 +1,4 @@
-import { Timestamp, collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { Timestamp, collection, query, where, getDocs, getDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import paws from './assets/paws.svg';
 import { db } from '../../firebase/firebase';
 import { useRef, useEffect } from 'react';

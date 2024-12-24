@@ -15,14 +15,23 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isRoleLoading, setIsRoleLoading] = useState(true);
 
+    const preloadImage = (src) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = resolve;
+            img.onerror = () => {
+                console.warn(`Failed to load image: ${src}`);
+                resolve(); // Resolve even if loading fails
+            };
+        });
+    };
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-        
             if (currentUser) {
-
-                // Check if the email is verified
                 if (!currentUser.emailVerified) {
-                    setUser(null); // Optionally set user to null if not verified
+                    setUser(null);
                     setIsLoading(false);
                     return;
                 }
@@ -30,44 +39,42 @@ export const AuthProvider = ({ children }) => {
                 setUser(currentUser);
 
                 const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-
                 if (userDoc.exists()) {
                     const userDataFromFirestore = userDoc.data();
-                    
-                    if(!userDataFromFirestore.profilePictureURL){
+
+                    // Handle profile picture
+                    if (!userDataFromFirestore.profilePictureURL) {
                         userDataFromFirestore.profilePictureURL = defaultProfile;
+                    } else {
+                        await preloadImage(userDataFromFirestore.profilePictureURL);
                     }
 
-                    // Check if the user is in the deactivatedUsers collection
+                    // Check if the user is deactivated
                     const q = query(collection(db, 'deactivatedUsers'), where('userID', '==', currentUser.uid));
                     const querySnapshot = await getDocs(q);
 
                     if (!querySnapshot.empty) {
-                        // User is deactivated, force sign out
                         await signOut(auth);
                         return;
                     }
-                    
+
                     setUserData(userDataFromFirestore);
-                }
-                else {
+                } else {
                     await signOut(auth);
                     return;
                 }
-                
             } else {
                 setUser(null);
                 setUserData(null);
             }
             setIsLoading(false);
             setIsRoleLoading(false);
-           
         });
-    
+
         return () => unsubscribe();
     }, []);
 
-    // Update the `lastActive` field periodically while the user is logged in
+    // Update lastActive timestamp
     useEffect(() => {
         let interval;
         if (user) {
@@ -80,21 +87,15 @@ export const AuthProvider = ({ children }) => {
                 }
             };
 
-            // Update every 60 seconds
             interval = setInterval(updateLastActive, 60000);
-
-            // Initial update when the user logs in
             updateLastActive();
         }
 
-        return () => {
-            // Clear the interval on logout
-            clearInterval(interval);
-        };
+        return () => clearInterval(interval);
     }, [user]);
 
     if (isLoading || isRoleLoading) {
-        return <LoadingScreen />;  // Display loading screen while checking auth status
+        return <LoadingScreen />;
     }
 
     return (

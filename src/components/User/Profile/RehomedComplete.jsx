@@ -34,7 +34,6 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
                             adopterLastName: data.adopterLastName,
                             adopterMI: data.adopterMI,
                             adopterAge: data.age,
-                            adopterCommitment: data.commitment,
                             adopterContact: data.contactNumber,
                             adopterBirthday: data.dateOfBirth,
                             dateSubmitted: data.dateSubmitted,

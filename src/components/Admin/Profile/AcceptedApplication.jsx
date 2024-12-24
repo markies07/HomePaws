@@ -264,7 +264,7 @@ function AcceptedApplication() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Location:</p>
-                                    <p>{pet.location}</p>
+                                    <p>{pet.barangay} {pet.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>
@@ -302,12 +302,12 @@ function AcceptedApplication() {
                                     </div>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Full Address:</p>
-                                    <p>{data.fullAddress}</p>
+                                    <p className='font-semibold'>Occupation:</p>
+                                    <p>{data.occupation}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
-                                    <p className='font-semibold'>Commitment:</p>
-                                    <p>{data.commitment}</p>
+                                    <p className='font-semibold'>Full Address:</p>
+                                    <p>{data.barangay} {data.municipality}, Cavite</p>
                                 </div>
                             </div>
                             <div className='pt-5 pb-2 flex justify-center gap-2'>

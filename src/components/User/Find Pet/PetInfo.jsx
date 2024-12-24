@@ -121,7 +121,7 @@ function PetInfo() {
 
 
     return (
-        <div className='pt-[8.75rem] lg:pt-[4.75rem] lg:pl-48 xl:pl-56 lg:pr-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
+        <div className='pt-[8.75rem] lg:pt-[4.75rem] lg:pl-48 xl:ml-7 xl:pl-52 lg:pr-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
             <div className={ !isFaqsOpen && !isEditOpen ? 'w-full flex flex-col lg:flex-row gap-3 h-full lg:pb-4 mt-4' : 'hidden'}>
                 <div className='relative px-4 pb-5 bg-secondary mx-auto sm:rounded-lg shadow-custom w-full sm:w-[90%] lg:w-full md:w-[80%] h-full'>
                     <img onClick={() => navigate(`/dashboard/find-pet`)} className='absolute border-2 lg:hidden border-secondary hover:border-text duration-150 cursor-pointer p-1 top-3 right-3' src={close} alt="" />

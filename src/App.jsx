@@ -66,7 +66,7 @@ function App() {
                     {/* DEFAULT REDIRECT ROUTE */}
 
                     {/* ADMIN ROUTE */}
-                    <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+                    <Route element={<PrivateRoute allowedRoles={['admin', 'superadmin']} />}>
                       <Route path="/admin/*" element={<AdDashboard />} >
 
                         {/* PET MANAGEMENT SECTION */}
