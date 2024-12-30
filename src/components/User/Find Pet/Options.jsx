@@ -1,10 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import post from '../assets/post.svg'
 import filter from '../assets/filter.svg'
 import close from '../../../assets/icons/close-dark.svg'
+import checkup from './assets/checkup.svg'
+import water from './assets/water.svg'
+import clean from './assets/clean.svg'
+import walk from './assets/walk.svg'
+import love from './assets/love.svg'
+
 
 function Options({openPostPet, changeFilter, selected, onFilterChange, filters}) {
   const [filterOpen, setFilterOpen] = useState(false);
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
   const handleFilterClick = () => {
     setFilterOpen(!filterOpen);
@@ -12,6 +19,14 @@ function Options({openPostPet, changeFilter, selected, onFilterChange, filters})
   const closeFilter = () => {
     setFilterOpen(!filterOpen);
   }
+
+  const tips = [
+    { category: "General Tips", title: "Regular Vet Checkups", icon: checkup, text: "Schedule annual or semi-annual vet visits to ensure your pet is healthy and up-to-date on vaccinations." },
+    { category: "General Tips", title: "Provide Fresh Water", icon: water, text: "Always keep a bowl of clean, fresh water available to keep your pet hydrated." },
+    { category: "For Cats", title: "Litter Box Hygiene", icon: clean, text: "Clean the litter box daily to keep your cat happy and to avoid unpleasant odors." },
+    { category: "For Dogs", title: "Daily Walks", icon: walk, text: "Take your dog on daily walks to keep them healthy and happy." },
+    { category: "Best Tips", title: "Love and Attention", icon: love, text: "Spend quality time with your pet daily. Pets thrive on affection and attention from their owners." },
+  ];
 
   const filterOptions = {
     breed: ['Any', 'Puspin', 'Aspin', 'German Shepherd', 'Golden Retriever', 'Persian', 'Pomeranian', 'Ragdol', 'Shih Tzu', 'Siamese', 'Siberian Husky', 'Other'],
@@ -44,7 +59,6 @@ function Options({openPostPet, changeFilter, selected, onFilterChange, filters})
       "Tanza",
       "Ternate",
       "Trece Martires",
-     
     ]
   };
 
@@ -55,6 +69,25 @@ function Options({openPostPet, changeFilter, selected, onFilterChange, filters})
     });
   };
 
+  useEffect(() => {
+    const calculateTipIndex = () => {
+      const now = new Date();
+      // Calculate tip index based on current time in minutes
+      return Math.floor(now.getTime() / (60 * 1000)) % tips.length;
+    };
+
+    // Set the initial tip index based on current time
+    setCurrentTipIndex(calculateTipIndex());
+
+    // Update the tip index every 1 minute
+    const interval = setInterval(() => {
+      setCurrentTipIndex(calculateTipIndex());
+    }, 60000); // 1 minute interval
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
+
+  const currentTip = tips[currentTipIndex];
 
   return (
     <div className='relative px-2 pt-3 lg:pt-4'>
@@ -90,6 +123,17 @@ function Options({openPostPet, changeFilter, selected, onFilterChange, filters})
           <img onClick={openPostPet} src={post} className='p-1 bg-[#E9E9E9] rounded-lg cursor-pointer hover:bg-[#dbdbdb] duration-150' alt="" />
           <p className='font-medium whitespace-nowrap '>Post Pet</p>
         </div>
+
+        {/* TIPS */}
+        <div className='bg-secondary px-4 py-4  h-full gap-4 justify-start items-center rounded-lg shadow-custom'>
+          <h3 className='font-semibold text-center'>{currentTip.category}</h3>
+          <div className='w-full flex justify-center pt-5 pb-3'>
+            <img src={currentTip.icon} alt="" />
+          </div>
+          <h4 className='font-medium text-center'>{currentTip.title}</h4>
+          <p className='text-sm pt-1 text-center'>{currentTip.text}</p>
+        </div>
+
       </div>
 
       {/* FILTER */}

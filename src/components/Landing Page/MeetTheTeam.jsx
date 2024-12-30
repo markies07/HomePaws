@@ -7,16 +7,16 @@ import close from './assets/close-dark.svg'
 function MeetTheTeam({closeCreator}) {
     return (
         <div className=' justify-center items-center px-5 py-5 sm:px-10 sm:py-10 bg-secondary min-h-screen w-full flex flex-col text-text font-poppins'>
-            <div>
+            <div className='pb-10'>
                 <div className='absolute top-4 right-4 border-2 border-secondary hover:border-text cursor-pointer p-1 duration-150'>
                     <img onClick={closeCreator} className='w-6 h-6 sm:w-7 sm:h-7' src={close} alt="" />
                 </div>
 
-                <div className='w-full h-full flex flex-col items-center text-text sm:my-10 bg-secondary'>
+                <div className='relative w-full h-full flex flex-col items-center text-text sm:my-10 bg-secondary'>
                     <p className='text-3xl font-medium border-b-2 px-5 pt-8 sm:pt-0 border-text'>Meet The Creators</p>
                     
                     {/* CONTENT */}
-                    <div className='mt-10 md:mt-14 flex flex-col md:flex-row gap-5 lg:gap-7'>
+                    <div className='mt-10 z-10 md:mt-14 flex flex-col md:flex-row gap-5 lg:gap-7'>
                         {/* MARK CHRISTIAN M. NAVAL */}
                         <div className='flex md:order-2 bg-primary text-white flex-col items-center text-center h-[22rem] md:h-[24rem] lg:h-[22rem] p-5 w-64 md:w-52 lg:w-64 rounded-lg shadow-custom'>
                             <img className='w-20 h-20 bg-secondary rounded-full' src={naval} alt="" />
@@ -42,9 +42,21 @@ function MeetTheTeam({closeCreator}) {
                         </div>
                     </div>
 
+                    {/* DESIGNS */}
+                    <div className='w-full h-full absolute hidden md:block'>
+                        <div className='bg-[#A1E4E4] h-24 w-24 rounded-full absolute top-3 right-10' />
+                        <div className='bg-[#A1E4E4] h-40 w-40 rounded-full absolute top-3 left-5' />
+                        <div className='bg-[#A1E4E4] h-40 w-40 rounded-full absolute -bottom-10 -left-10' />
+                        <div className='bg-[#A1E4E4] h-24 w-24 rounded-full absolute bottom-40 right-52' />
+                        <div className='bg-[#A1E4E4] h-32 w-32 rounded-full absolute -bottom-7 -right-7' />
+                        <div className='bg-[#A1E4E4] h-20 w-20 rounded-full absolute bottom-20 left-56' />
+                        <div className='bg-[#A1E4E4] h-40 w-40 rounded-full absolute -bottom-16 left-80' />
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
         
     )
