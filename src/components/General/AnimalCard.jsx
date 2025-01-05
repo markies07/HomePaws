@@ -20,7 +20,6 @@ function AnimalCard({onLoginClick}) {
     fetchPets();
   }, []);
 
-  console.log(pets)
 
   return (
     <>

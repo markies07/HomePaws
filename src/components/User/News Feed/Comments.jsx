@@ -9,9 +9,15 @@ function Comments({closeComment, postID, handleComment, post}) {
     const { fetchComments, loading } = useLikesAndComments();
     const [commentText, setCommentText] = useState('');
     const [comments, setComments] = useState([]);
+    const [isPosting, setIsPosting] = useState(false);
 
     const submitComment = async (e) => {
         e.preventDefault();
+
+        if (isPosting) return;
+
+        setIsPosting(true);
+
         if (commentText.trim()) {
             try {
                 const newComment = await handleComment(postID, user.uid, commentText);
@@ -21,6 +27,10 @@ function Comments({closeComment, postID, handleComment, post}) {
                 setCommentText('');
             } catch (error) {
                 console.error("Error submitting comment: ", error);
+                setIsPosting(false);
+            }
+            finally{
+                setIsPosting(false);
             }
         }
     };
@@ -123,7 +133,7 @@ function Comments({closeComment, postID, handleComment, post}) {
             <form onSubmit={submitComment} className='mt-3 flex items-center gap-2 px-3 sm:px-5'>
                 <input required value={commentText} onChange={(e) => setCommentText(e.target.value)} className='bg-secondary w-full rounded-full px-4 pt-3 pb-2 outline-none' placeholder='Write a comment.' type="text" />
                 {commentText.trim() && (
-                    <button className='w-11 h-12 shrink-0' type='submit' aria-hidden="true">
+                    <button className='w-11 h-12 shrink-0' disabled={isPosting} type='submit' aria-hidden="true">
                         <img className='w-12 h-11 p-2 pt-3 cursor-pointer overflow-visible bg-primary rounded-full hover:bg-primaryHover duration-200' src={postComment} alt="" />
                     </button>
                 )}

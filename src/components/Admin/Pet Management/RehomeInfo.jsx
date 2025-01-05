@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../General/AuthProvider';
-import { addDoc, collection, doc, getDoc, query, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import Contract from '../../User/Profile/Contract';
 import LoadingScreen from '../../General/LoadingScreen';
@@ -99,7 +99,7 @@ function RehomeInfo() {
             })
             chatID = newChatRef.id;
         }
-        navigate(`/dashboard/chat/convo/${chatID}`);
+        navigate(`/admin/chat/convo/${chatID}`);
     }
 
     if(loading){

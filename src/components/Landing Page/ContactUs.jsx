@@ -47,6 +47,7 @@ function ContactUs({closeContact}) {
             emailjs.send('service_yii1sji', 'template_tbq0xuh', emailData, 'JT0EGxZqCSR3-9IIa')
                 .then(() => {
                     successAlert(`Your message has been sent!`);
+                    console.log("Email Sent!");
                 })
                 .catch((error) => {
                     console.error("Email failed to send", error);

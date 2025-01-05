@@ -19,7 +19,7 @@ function ReportManagement() {
                 const reportRef = query(
                     collection(db, 'userReports'),
                     where('status', 'in', status),
-                    orderBy(isPending ? 'reportedBy' : 'actionAt', 'desc')
+                    orderBy(isPending ? 'reportedAt' : 'actionAt', 'desc')
                 );
 
                 const snapshot = await getDocs(reportRef);

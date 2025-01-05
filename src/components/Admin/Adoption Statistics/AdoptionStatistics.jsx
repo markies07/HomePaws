@@ -164,25 +164,29 @@ function AdoptionStatistics() {
                         <AdoptionReport />
                     </div>
 
-                    <div className='flex flex-col items-center justify-center w-full sm:h-full'>
-                        <p className='w-full text-center font-medium leading-5 pb-2 text-lg'>
-                            Pets for Adoption by Barangay in General Trias
-                        </p>
-                        <div className='w-[80%] pt-5 h-72 font-poppins'>
-                            <Pie
-                                data={adoptionChartData}
-                                options={chartOptions}
-                            />
+                    <div className='flex flex-col xl:flex-row items-center justify-center py-3 w-full sm:h-full'>
+                        <div className='flex flex-col items-center justify-center w-full'>
+                            <p className='w-full text-center font-medium leading-5 pb-2 xl:pb-5 text-lg'>
+                                Pets for Adoption by Barangay in General Trias
+                            </p>
+                            <div className='w-[80%] pt-5 h-72 font-poppins'>
+                                <Pie
+                                    data={adoptionChartData}
+                                    options={chartOptions}
+                                />
+                            </div>
                         </div>
                         
-                        <p className='w-full text-center mt-14 leading-5 font-medium pb-2 text-lg'>
-                            Rehomed Pets by Barangay in General Trias
-                        </p>
-                        <div className='w-[80%] pt-5 h-72 font-poppins'>
-                            <Pie
-                                data={rehomedChartData}
-                                options={chartOptions}
-                            />
+                        <div className='flex flex-col items-center justify-center w-full'>
+                            <p className='w-full text-center mt-14 xl:mt-0 leading-5 font-medium pb-2 xl:pb-5 text-lg'>
+                                Rehomed Pets by Barangay in General Trias
+                            </p>
+                            <div className='w-[80%] pt-5 h-72 font-poppins'>
+                                <Pie
+                                    data={rehomedChartData}
+                                    options={chartOptions}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

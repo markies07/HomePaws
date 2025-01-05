@@ -243,7 +243,7 @@ function Conversation() {
                             {/* MESSAGE */}
                             <div className='w-[60%] flex justify-end'>
                                 {message.image ? ( // Check if there's an image
-                                    <img src={message.image} onClick={() => showModal(message.image)} alt="sent" className='max-w-full cursor-pointer rounded-lg mb-2' />
+                                    <img src={message.image} onClick={() => showModal(message.image)} alt="sent" className='max-w-full object-cover cursor-pointer rounded-lg mb-2' />
                                 ) : (
                                     <p className='bg-primary w-fit py-2 px-3 rounded-2xl rounded-br-none text-white'>{message.text}</p>
                                 )}
@@ -255,7 +255,7 @@ function Conversation() {
                         // SENDER
                         <div key={message.id} className='flex w-full justify-start'>
                             {/* PROFILE */}
-                            <img className='w-10 h-10 self-end shrink-0 rounded-full bg-text mr-3' src={otherUser.profilePictureURL} alt="" />
+                            <img className='w-10 h-10 self-end shrink-0 object-cover rounded-full bg-text mr-3' src={otherUser.profilePictureURL} alt="" />
                             {/* MESSAGE */}
                             <div className='w-[60%]'>
                                 {message.image ? ( // Check if there's an image
