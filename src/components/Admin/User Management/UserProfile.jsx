@@ -26,30 +26,55 @@ function UserProfile() {
     const { handleLike, handleUnlike, handleComment } = useLikesAndComments();
     const [isCommentOpen, setIsCommentOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
+    const [isDeactivated, setIsDeactivated] = useState(false);
+    const [isBanned, setIsBanned] = useState(false);
     const { showModal } = useImageModal();
 
     // FETCHING USER DATA
     useEffect(() => {
         const fetchUserProfile = async () => {
-            try{
-                const docRef = doc(db, 'users', userID);
-                const docSnap = await getDoc(docRef);
+            try {
+                // Check if the user exists in the 'bannedUsers' collection first
+                const bannedRef = doc(db, 'bannedUsers', userID);
+                const bannedSnap = await getDoc(bannedRef);
 
-                if(docSnap.exists()){
-                    setData(docSnap.data());
+                if (bannedSnap.exists()) {
+                    setData(bannedSnap.data()); // Set data from 'bannedUsers'
+                    setIsBanned(true);    // Ensure the deactivated state is false
+                    console.log("User data fetched from bannedUsers collection");
+                    return; // Exit early since the data is already set
                 }
-                else{
-                    console.log("No document!");
+
+                // Check if the user exists in the 'users' collection
+                const userRef = doc(db, 'users', userID);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    setData(userSnap.data()); // Set data from 'users'
+                    console.log("User data fetched from users collection");
+                } else {
+                    console.log("No user document found!");
                 }
-            }
-            catch(error){
+
+                // Check if the user exists in the 'deactivatedUsers' collection
+                const deactivatedRef = doc(db, 'deactivatedUsers', userID);
+                const deactivatedSnap = await getDoc(deactivatedRef);
+
+                if (deactivatedSnap.exists()) {
+                    setIsDeactivated(true); // User is deactivated
+                } else {
+                    setIsDeactivated(false); // User is not deactivated
+                }
+            } catch (error) {
                 console.error(error);
             }
-        }
-        if(userID){
+        };
+
+        if (userID) {
             fetchUserProfile();
         }
     }, [userID]);
+
 
 
     // FETCHING USER POST
@@ -180,6 +205,7 @@ function UserProfile() {
     const toggleAction = () => {
         setIsActionOpen(!isActionOpen);
     }
+    
 
     return (
         <div className='pt-36 lg:pt-20 lg:pl-52 px-3 z-30 lg:pr-3 lg:ml-7 min-h-screen flex flex-col font-poppins text-text'>
@@ -205,13 +231,13 @@ function UserProfile() {
                 </div>
 
                 {/* ACTIONS MOBILE */}
-                <div className='absolute md:hidden top-3 right-3 flex flex-col gap-2'>
+                <div className={`${isDeactivated || isBanned ? 'hidden' : 'flex'} absolute md:hidden top-3 right-3 flex flex-col gap-2`}>
                     <button onClick={toggleAction} className={`${data.role === 'admin' && userData.role != 'superadmin' ? 'hidden' : 'block'} bg-text rounded-md hover:bg-[#707070] duration-150`}><img className='w-9 p-2' src={actions} alt="" /></button>
                     <button onClick={() => handleStartChat(data.uid)} className=' bg-[#8FBB3E] rounded-md hover:bg-[#7ea534] duration-150'><img className='w-9 p-2' src={message} alt="" /></button>
                 </div>
 
                 {/* ACTIONS DESKTOP */}
-                <div className='self-start hidden md:flex justify-end relative w-full gap-2 mt-2 md:mt-0'>
+                <div className={`${isDeactivated || isBanned ? 'hidden' : 'md:flex'} self-start hidden justify-end relative w-full gap-2 mt-2 md:mt-0`}>
                     <button onClick={() => handleStartChat(data.uid)} className='bg-[#8FBB3E] flex hover:bg-[#7ea534] items-center gap-2 sm:w-40 sm:px-3 sm:text-sm sm:whitespace-nowrap duration-150 py-2 text-xs text-white rounded-md w-full leading-3 font-medium'> <img className='w-5' src={message} alt="" /> MESSAGE <br className='sm:hidden' /> USER</button>
                     <button onClick={toggleAction} className={`${data.role === 'admin' && userData.role != 'superadmin' ? 'hidden' : 'block'} bg-text rounded-md hover:bg-[#707070] duration-150`}><img className='w-9 p-2' src={actions} alt="" /></button>
                 </div>

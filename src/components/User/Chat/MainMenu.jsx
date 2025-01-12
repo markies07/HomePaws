@@ -60,35 +60,49 @@ function MainMenu() {
 
     // FETCHING EXISTING CHATS
     useEffect(() => {
-        const q = query(
-            collection(db, 'chats'),
-            where('participants', 'array-contains', user.uid),
-            orderBy('latestMessage.sentAt', 'desc')
-        );
-
-        const unsubscribe = onSnapshot(q, async (snapshot) => {
-            try{
+        const fetchChats = async () => {
+            try {
                 setLoading(true);
-                const fetchedChats = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
     
-                const chatsWithMessages = fetchedChats.filter(chat => chat.latestMessage && chat.latestMessage.sentAt);
+                // Query chats where user is a participant
+                const q = query(
+                    collection(db, 'chats'),
+                    where('participants', 'array-contains', user.uid),
+                    orderBy('latestMessage.sentAt', 'desc')
+                );
     
-                const chatWithUnreadStatus = await Promise.all(chatsWithMessages.map(async (chat) => {
-                    const messsagesRef = collection(db, 'chats', chat.id, `messages_${user.uid}`);
-                    const unreadQuery = query(messsagesRef, where('read', '==', false));
-                    const unreadSnapshot = await getDocs(unreadQuery);
-                    const hasUnread = !unreadSnapshot.empty;
-                    return { ...chat, hasUnread };
-                }))
-                
+                const snapshot = await getDocs(q);
+    
+                // Filter chats based on the existence of `messages_(userID)`
+                const validChats = [];
+                for (const doc of snapshot.docs) {
+                    const chat = { id: doc.id, ...doc.data() };
+    
+                    // Check if `messages_(userID)` exists
+                    const messagesRef = collection(db, 'chats', chat.id, `messages_${user.uid}`);
+                    const messagesSnapshot = await getDocs(messagesRef);
+    
+                    // Only include chat if the subcollection has documents
+                    if (!messagesSnapshot.empty) {
+                        validChats.push(chat);
+                    }
+                }
+    
+                // Check for unread messages
+                const chatWithUnreadStatus = await Promise.all(
+                    validChats.map(async (chat) => {
+                        const messagesRef = collection(db, 'chats', chat.id, `messages_${user.uid}`);
+                        const unreadQuery = query(messagesRef, where('read', '==', false));
+                        const unreadSnapshot = await getDocs(unreadQuery);
+                        const hasUnread = !unreadSnapshot.empty;
+                        return { ...chat, hasUnread };
+                    })
+                );
+    
                 setChats(chatWithUnreadStatus);
-                
     
-                const participantIds = [...new Set(fetchedChats.flatMap(chat => chat.participants))];
-                
+                // Fetch participant details
+                const participantIds = [...new Set(validChats.flatMap(chat => chat.participants))];
                 const fetchUsersData = async () => {
                     const chunkSize = 10;
                     const chunks = [];
@@ -98,34 +112,28 @@ function MainMenu() {
                     }
     
                     const users = {};
-                    
                     for (const chunk of chunks) {
                         const q = query(collection(db, 'users'), where('uid', 'in', chunk));
                         const usersSnapshot = await getDocs(q);
-                        
                         usersSnapshot.docs.forEach(docSnap => {
                             if (docSnap.exists()) {
                                 users[docSnap.id] = docSnap.data();
                             }
                         });
                     }
-    
                     setUsersData(users);
                 };
                 fetchUsersData();
-            }
-            catch(error){
-                console.log(error);
-            }
-            finally{
+            } catch (error) {
+                console.error('Error fetching chats:', error);
+            } finally {
                 setLoading(false);
             }
-        
-
-        });
-
-        return () => unsubscribe();
+        };
+    
+        fetchChats();
     }, [user.uid]);
+    
 
     useEffect(() => {
         const filtered = chats.filter(chat => {

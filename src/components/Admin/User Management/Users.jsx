@@ -9,7 +9,7 @@ function Users({filteredUsers}) {
         <div className='flex flex-col gap-3 w-full h-full py-4 px-5 xl:px-7 overflow-y-auto'>
             {filteredUsers.length === 0 ? (
                 <div className='bg-[#E9E9E9] relative w-full py-5 rounded-lg flex items-center justify-center'>
-                    <p className='font-medium text-center leading-4 w-52'>No Users Found</p>
+                    <p className='font-medium text-center leading-4 w-52'>No User Found</p>
                 </div>
             ) : 
             filteredUsers.map(user => (

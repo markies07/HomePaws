@@ -107,7 +107,7 @@ function Comments({closeComment, postID, handleComment, post}) {
                     comments.map((comment, index) => (
                         <div key={index} className='mb-3 flex'>
                             {/* PROFILE PIC */}
-                            <img className='w-10 h-10 bg-text rounded-full' src={comment.profilePicture} alt="" />
+                            <img className='w-10 h-10 bg-text rounded-full object-cover' src={comment.profilePicture} alt="" />
                             {/* COMMENT */}
                             <div>
                                 <div className='bg-secondary px-3 sm:px-4 py-2 ml-2 rounded-xl'>

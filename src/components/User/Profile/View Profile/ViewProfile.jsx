@@ -225,7 +225,7 @@ function ViewProfile() {
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
                                 </div>
-                                <p className={`${data.role === 'admin' ? 'block' : 'hidden'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Admin</p>
+                                <p className={`${data.role === 'admin' || data.role === 'superadmin' ? 'block' : 'hidden'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Admin</p>
                             </div>
                         </div>
 
@@ -235,7 +235,7 @@ function ViewProfile() {
                                 <img className='w-5 sm:w-7' src={message} alt="" />
                             </div> 
                             {/* REPORT USER */}
-                            <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : 'flex'} bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer`}>
+                            <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : data.role === 'superadmin' ? 'hidden' : 'flex'} bg-[#D9D9D9] md:hidden hover:bg-[#cecece] duration-150 p-2 rounded-md cursor-pointer`}>
                                 <img className='w-5 sm:w-7' src={reportUser} alt="" />
                             </div> 
                         </div>
@@ -244,7 +244,7 @@ function ViewProfile() {
 
                     <div className='w-1/2 hidden md:flex mt-2 md:mt-0 z-10 justify-center md:justify-end md:gap-3'>
                         {/* REPORT USER */}
-                        <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : 'flex'} bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md`}>
+                        <div onClick={openReportUser} className={`${data.role === 'admin' ? 'hidden' : data.role === 'superadmin' ? 'hidden' : 'flex'} bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md`}>
                             <img className='w-9 mt-1' src={reportUser} alt="" />
                             <p className='font-medium text-center pt-2 text-xs'>Report User</p>
                         </div>
@@ -252,7 +252,7 @@ function ViewProfile() {
                         {/* MESSAGE USER */}
                         <div onClick={() => handleStartChat(userID)} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 cursor-pointer justify-center flex flex-col items-center w-full sm:w-28 py-3 px-3 rounded-md'>
                             <img className='w-9 mt-1' src={message} alt="" />
-                            <p className='font-medium text-center pt-2 leading-4 text-xs'>{data.role === 'admin' ? 'Message Admin' : 'Message User'}</p>
+                            <p className='font-medium text-center pt-2 leading-4 text-xs'>{data.role === 'admin' ? 'Message Admin' : data.role === 'superadmin' ? 'Message Admin' : 'Message User'}</p>
                         </div>
                     </div>
                 </div>

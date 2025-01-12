@@ -183,7 +183,7 @@ function Reported() {
                                     <div className='flex flex-col mt-3 lg:mt-4 bg-secondary pt-6 py-4 px-5 md:px-7 sm:mx-auto lg:mx-0 mb-3 w-full text-text sm:w-[97%] lg:w-full rounded-lg shadow-custom'>
                                         {/* USER INFORMATION */}
                                         <div className='flex w-full'>
-                                            <img src={reported?.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] rounded-full' />
+                                            <img src={reported?.profilePictureURL} className='w-10 h-10 bg-[#D9D9D9] rounded-full object-cover' />
                                             <div className='ml-2'>
                                                 <p className='font-medium'>{post?.userName} <span className='text-xs sm:text-sm sm:px-3 font-normal ml-1 text-white rounded-full px-2' style={{backgroundColor: post?.typeOfPost === 'story' ? '#A87CCD' : post?.typeOfPost === 'missing' ? '#ED5050' : '#85B728'}}>{post?.typeOfPost}</span></p>
                                                 <p className='-mt-[3px] text-xs'>{getTimeDifference(post?.createdAt)}</p>

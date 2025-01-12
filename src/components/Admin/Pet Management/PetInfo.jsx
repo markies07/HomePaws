@@ -188,7 +188,7 @@ function PetInfo() {
                             <div className='h-[1px] w-full relative bg-text'></div>
                         </div>
                         <div className='my-2'> 
-                            <p className='text-2xl font-medium pt-2'>RAQs</p> 
+                            <p className='text-2xl font-medium pt-2'>FAQs</p> 
                             <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet for free?</p>
                             <p className={`${pet.isItFree === 'Yes' ? 'bg-[#8cbd31] px-2 gap-1 inline-flex justify-center py-1 rounded-md text-white items-center font-medium' : 'bg-primary px-2 gap-1 inline-flex justify-center items-center py-1 rounded-md text-white font-medium'} whitespace-pre-wrap`}><img className={`${pet.isItFree === 'Yes' ? 'block' : 'hidden'} w-4 h-4`} src={yes} /> <img className={`${pet.isItFree === 'No' ? 'block' : 'hidden'} w-3 h-3`} src={no} /> {pet.isItFree}</p>
                             <p className='whitespace-pre-wrap font-medium pt-2'>Is the pet good with kids?</p>

@@ -36,6 +36,29 @@ function Posts() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const navigate = useNavigate();
 
+    const [adminUsers, setAdminUsers] = useState({}); // To store admin status of users
+
+    useEffect(() => {
+        // Fetch all admin users at once
+        const fetchAdminUsers = async () => {
+            try {
+                const q = query(collection(db, 'users'), where('role', '==', 'admin'));
+                const querySnapshot = await getDocs(q);
+
+                const admins = {};
+                querySnapshot.forEach((doc) => {
+                    admins[doc.id] = true; // Store userID of admin users
+                });
+
+                setAdminUsers(admins);
+            } catch (error) {
+                console.error('Error fetching admin users:', error);
+            }
+        };
+
+        fetchAdminUsers();
+    }, []);
+
 
     // FETCHING THE STATE OF LIKE POSTS
     useEffect(() => {
@@ -50,7 +73,6 @@ function Posts() {
             });
         }
     }, [posts, user.uid]);
-
 
     const toggleLike = (postID) => {
         const isLiked = likedPosts[postID];
@@ -193,6 +215,7 @@ function Posts() {
         })
     }
 
+    console.log(adminUsers)
 
     return (
         <>
@@ -211,7 +234,7 @@ function Posts() {
                         <div key={post.id} className='bg-secondary relative w-full sm:rounded-lg shadow-custom py-5 px-5 md:px-7'>
                             
                             {/* SETTINGS */}
-                            <img onClick={() => toggleSettings(post.id)} className='absolute cursor-pointer top-0 py-3 px-2 sm:px-3 right-0' src={isSettingsOpen === post.id ? close : settings} alt="" />
+                            <img  onClick={() => toggleSettings(post.id)} className={` absolute cursor-pointer top-0 py-3 px-2 sm:px-3 right-0`} src={isSettingsOpen === post.id ? close : settings} alt="" />
                             <div className={`${isSettingsOpen === post.id ? 'block' : 'hidden'} absolute top-10 p-1 rounded-lg right-4 bg-white shadow-custom`}>
                                 <div onClick={() => openReport(post.id)} style={{display: post.userID === user.uid ? 'none' : 'flex'}} className='px-5 py-2 cursor-pointer hover:bg-[#e6e6e6] duration-150 items-center gap-3'>
                                     <img src={reportPost} alt="" />
