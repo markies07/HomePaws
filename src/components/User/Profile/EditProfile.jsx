@@ -8,7 +8,7 @@ import { AuthContext } from '../../General/AuthProvider';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db, storage } from '../../../firebase/firebase'
 import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage'
-import { notifySuccessOrange } from '../../General/CustomToast'
+import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast'
 import selectedDog from './assets/selectedDog.svg'
 import selectedCat from './assets/selectedCat.svg'
 import selectedBoth from './assets/selectedBoth.svg'
@@ -51,6 +51,12 @@ function EditProfile({closeEdit}) {
 
     const handleSaveChanges = async () => {
         setLoading(true);
+
+        if(fullName.trim() === ''){
+            notifyErrorOrange('Please input your full name!');
+            setLoading(false);
+            return;
+        }
 
         try{
             const userRef = doc(db, 'users', user.uid);

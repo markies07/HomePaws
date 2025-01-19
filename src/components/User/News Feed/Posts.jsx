@@ -36,29 +36,6 @@ function Posts() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(null);
     const navigate = useNavigate();
 
-    const [adminUsers, setAdminUsers] = useState({}); // To store admin status of users
-
-    useEffect(() => {
-        // Fetch all admin users at once
-        const fetchAdminUsers = async () => {
-            try {
-                const q = query(collection(db, 'users'), where('role', '==', 'admin'));
-                const querySnapshot = await getDocs(q);
-
-                const admins = {};
-                querySnapshot.forEach((doc) => {
-                    admins[doc.id] = true; // Store userID of admin users
-                });
-
-                setAdminUsers(admins);
-            } catch (error) {
-                console.error('Error fetching admin users:', error);
-            }
-        };
-
-        fetchAdminUsers();
-    }, []);
-
 
     // FETCHING THE STATE OF LIKE POSTS
     useEffect(() => {
@@ -215,7 +192,6 @@ function Posts() {
         })
     }
 
-    console.log(adminUsers)
 
     return (
         <>

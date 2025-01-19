@@ -24,8 +24,7 @@ export const UserPostsProvider = ({ children }) => {
             postsQuery = query(
               collection(db, 'userPosts'),
               where('isBanned', '==', false),
-              orderBy('createdAt', 'desc'),
-              limit(10)
+              orderBy('createdAt', 'desc')
             );
           }
           else{
@@ -33,8 +32,7 @@ export const UserPostsProvider = ({ children }) => {
               collection(db, 'userPosts'), 
               where('typeOfPost', '==', filterType),
               where('isBanned', '==', false),
-              orderBy('createdAt', 'desc'),
-              limit(10)
+              orderBy('createdAt', 'desc')
             );
           }
 
