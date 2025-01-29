@@ -164,6 +164,7 @@ function AdoptionForm() {
         try{
             const docRef = await addDoc(collection(db, 'adoptionApplications'), {
                 ...formData,
+                petImage: pet.petImages[0],
                 dateSubmitted: Timestamp.now(),
                 status: 'pending',
             });
@@ -411,7 +412,7 @@ function AdoptionForm() {
                     </div>
                     <div className='w-full flex pb-5 pt-3'>
                         <div className='w-full gap-2 flex justify-center'>
-                            <img className='w-7 h-7 object-cover' src={isAccepted ? check : uncheck} alt="" />
+                            <img onClick={toggleTerms} className='w-7 h-7 object-cover cursor-pointer' src={isAccepted ? check : uncheck} alt="" />
                             <p onClick={toggleTerms} className='font-semibold text-lg text-text underline cursor-pointer'>Read Terms and Conditions</p>
                         </div>
                     </div>
