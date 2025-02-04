@@ -86,6 +86,7 @@ function Login({ isOpen, onClose, handleCreateClick, handleLogin }) {
                         createdAt: new Date(),
                         fullName,
                         email,
+                        isVerified: false,
                         profilePictureURL,
                         role: 'user'
                     });

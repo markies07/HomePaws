@@ -5,9 +5,12 @@ import picture from './assets/profile-pic.svg'
 import pet from './assets/pet-image.png'
 import { createUserWithEmailAndPassword, sendEmailVerification, auth, onAuthStateChanged } from '../../firebase/firebase'
 import { getFirestore, doc, setDoc } from 'firebase/firestore'
-import { notifyErrorWhite, notifySuccessWhite, notifyInfoWhite } from '../General/CustomToast'
+import { notifyErrorWhite, notifySuccessWhite, notifyInfoWhite, notifyErrorOrange } from '../General/CustomToast'
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
+import TermsAndConditions from './TermsAndConditions';
+import check from '../User/Find Pet/assets/check.svg';
+import uncheck from '../User/Find Pet/assets/uncheck.svg';
 
 function CreateAccount({ createOpen, createClose }) {
     const [fullName, setFullName] = useState('');
@@ -18,6 +21,8 @@ function CreateAccount({ createOpen, createClose }) {
     const [isVerifying, setIsVerifying] = useState(false);
     const [user, setUser] = useState(null);
     const [pendingUserData, setPendingUserData] = useState(null);
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
+    const [isAccepted, setIsAccepted] = useState(false);
     
     const navigate = useNavigate();
 
@@ -39,6 +44,10 @@ function CreateAccount({ createOpen, createClose }) {
             setProfilePicture(e.target.files[0]);
         }
     };
+
+    const toggleTerms = () => {
+        setIsTermsOpen(!isTermsOpen);
+    }
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -82,6 +91,7 @@ function CreateAccount({ createOpen, createClose }) {
             uid: user.uid,
             email: userData.email,
             profilePictureURL,
+            isVerified: false,
             createdAt: new Date(),
             role: 'user'
         });
@@ -90,6 +100,11 @@ function CreateAccount({ createOpen, createClose }) {
     const handleCreateAccount = async (e) => {
         e.preventDefault();
         console.log("Creating account...");
+
+        if(!isAccepted) {
+            notifyErrorWhite('You need to accept terms and conditions');
+            return;
+        }
 
         if(profilePicture === null) {
             notifyErrorWhite("Add your profile picture!");
@@ -192,8 +207,16 @@ function CreateAccount({ createOpen, createClose }) {
                         <p className='font-semibold'>Password</p>
                         <input onChange={(e) => setPassword(e.target.value)} required value={password} autoComplete='off' className='w-full mb-4 md:mb-3 py-2 px-3 rounded-lg outline-none bg-[#D9D9D9]' type="password" />
                         <p className='font-semibold'>Confirm Password</p>
-                        <input onChange={(e) => setConfirmPassword(e.target.value)} required value={confirmPassword} autoComplete='off' className='w-full mb-4 md:mb-3 py-2 px-3 rounded-lg outline-none bg-[#D9D9D9]' type="password" />
+                        <input onChange={(e) => setConfirmPassword(e.target.value)} required value={confirmPassword} autoComplete='off' className='w-full py-2 px-3 rounded-lg outline-none bg-[#D9D9D9]' type="password" />
                         <div className='mt-5 mb-2 flex flex-col items-center'>
+
+                            <div className='w-full flex pb-5'>
+                                <div className='w-full gap-2 flex justify-center'>
+                                    <img onClick={toggleTerms} className='w-7 h-7 object-cover cursor-pointer' src={isAccepted ? check : uncheck} alt="" />
+                                    <p onClick={toggleTerms} className='font-semibold text-text underline cursor-pointer'>Read Terms and Conditions</p>
+                                </div>
+                            </div>
+
                             {isVerifying ? (
                                 <>
                                     <p>Please verify your email to complete registration.</p>
@@ -215,6 +238,10 @@ function CreateAccount({ createOpen, createClose }) {
                             )}
                         </div>
                     </form>
+                </div>
+                {/* TERMS AND CONDITIONS */}
+                <div className={isTermsOpen ? 'block' : 'hidden'}>
+                    < TermsAndConditions setIsAccepted={setIsAccepted} closeTerms={toggleTerms} />
                 </div>
             </div>
         </div>

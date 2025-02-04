@@ -5,7 +5,7 @@ import cat from '../assets/cat.svg'
 import both from '../assets/both.svg'
 import looking from '../assets/looking.svg'
 import { AuthContext } from '../../General/AuthProvider';
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore'
 import { db, storage } from '../../../firebase/firebase'
 import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage'
 import { notifyErrorOrange, notifySuccessOrange } from '../../General/CustomToast'
@@ -15,7 +15,7 @@ import selectedBoth from './assets/selectedBoth.svg'
 import selectedLooking from './assets/selectedLooking.svg'
 
 
-function EditProfile({closeEdit}) {
+function EditProfile({closeEdit, openVerify}) {
     const { userData, user } = useContext(AuthContext);
     const [fullName, setFullName] = useState('');
     const [profilePictureURL, setProfilePictureURL] = useState('');
@@ -23,6 +23,7 @@ function EditProfile({closeEdit}) {
     const [preview, setPreview] = useState('');
     const [loading, setLoading] = useState(false);
     const [petOwnerType, setPetOwnerType] = useState('');
+    const [isPending, setIsPending] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -111,6 +112,38 @@ function EditProfile({closeEdit}) {
         }
     }
 
+    useEffect(() => {
+        
+        const checkVerificationStatus = async () => {
+            try {
+                const verificationRef = collection(db, 'pendingVerification');
+
+                // Create a query to find the application with the current user and petID
+                const q = query(
+                    verificationRef,
+                    where('userID', '==', user.uid),
+                );
+
+                // Execute the query
+                const querySnapshot = await getDocs(q);
+
+                // Check if there are any matching documents
+                if (!querySnapshot.empty) {
+                    setIsPending(true)  // User has already applied
+                }
+                else {
+                    setIsPending(false);
+                }
+                console.log(querySnapshot)
+            } catch (error) {
+                console.error("Error checking application status: ", error);
+            }
+        };
+
+        checkVerificationStatus();
+        
+    }, []);
+
 
     return (
         <div className='p-3 lg:pt-3 lg:px-0 min-h-[calc(100dvh-145px)] lg:min-h-[calc(100dvh-80px)] w-full'>
@@ -158,7 +191,10 @@ function EditProfile({closeEdit}) {
                             </div>
                         </div>
                     </div>
-                    <button onClick={handleSaveChanges} className='bg-primary font-medium text-center my-3 py-2 px-5 rounded-md hover:bg-primaryHover duration-150 text-white'>{loading ? 'Saving...' : 'Save Changes'}</button>
+                    <div className='flex gap-3'>
+                        <button onClick={openVerify} disabled={isPending} className={`${userData.isVerified === false ? 'block' : 'hidden'} ${isPending ? 'text-primary' : 'bg-primary hover:bg-primaryHover text-white'} text-sm font-medium text-center my-3 py-2 px-3 sm:px-5 rounded-md duration-150 `}>{isPending ? 'Pending Verification' : 'Verify Account'}</button>
+                        <button onClick={handleSaveChanges} className='bg-primary text-sm font-medium text-center my-3 py-2 px-3 sm:px-5 rounded-md hover:bg-primaryHover duration-150 text-white'>{loading ? 'Saving...' : 'Save Changes'}</button>
+                    </div>
                 </div>
                 
             </div>

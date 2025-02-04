@@ -5,6 +5,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { AuthContext } from '../../General/AuthProvider';
 import close from './assets/close.svg';
+import VerifyReq from './VerifyReq';
 
 
 function UserManagement() {
@@ -14,6 +15,7 @@ function UserManagement() {
     const [deactivatedUsers, setDeactivatedUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filter, setFilter] = useState('all'); // 'all', 'admins', 'banned', or 'deactivated'
+    const [isVerifyOpen, setIsVerifyOpen] = useState(false);
 
     // Fetch users with "isAdmin" or any user from the "users" collection
     useEffect(() => {
@@ -66,15 +68,17 @@ function UserManagement() {
         );
     };
 
-    console.log(deactivatedUsers)
+    const toggleVerify = () => {
+        setIsVerifyOpen(!isVerifyOpen);
+    }
 
 
     return (
         <div className='pt-36 lg:pt-20 lg:pl-52 z-30 lg:pr-3 lg:ml-4 min-h-screen flex flex-col font-poppins text-text'>
             <div className='flex-grow mt-3 flex flex-col gap-1 items-center lg:items-start lg:flex-row'>
-                <div className='flex-col flex w-full lg:flex-row mx-auto'>
+                <div className={`${isVerifyOpen ? 'hidden' : 'block'} flex-col flex w-full lg:flex-row mx-auto`}>
                     <div className='order-1 lg:order-2'>
-                        <Search setFilter={setFilter} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        <Search openVerify={toggleVerify} setFilter={setFilter} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                     </div>
                     <div className='order-2 lg:order-1 lg:ml-3 my-3 lg:my-0 lg:mb-3 justify-center flex-col flex mx-auto flex-grow sm:rounded-lg lg:rounded-lg bg-secondary shadow-custom w-full sm:w-[90%] lg:w-full lg:mr-[14.75rem] xl:mr-[15.75rem] 2xl:mr-[17.75rem]'>
                         <div className={filter !== 'all' ? 'block pl-5 xl:pl-7 pt-4 relative' : 'hidden'}>
@@ -85,6 +89,9 @@ function UserManagement() {
                         </div>
                         <Users filteredUsers={getFilteredUsers()} />    
                     </div>
+                </div>
+                <div className={`${isVerifyOpen ? 'block' : 'hidden'} w-full`}>
+                    <VerifyReq closeVerify={toggleVerify} />
                 </div>
             </div>
         </div>

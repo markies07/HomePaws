@@ -22,6 +22,8 @@ function UserProfile({openPetListed, openFavPets, openEdit}) {
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
                             </div>
+                            <p className={`${userData.isVerified === true ? 'hidden' : 'block'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Unverified</p>
+                            <p className={`${userData.isVerified === false ? 'hidden' : 'block'} bg-[#80A933] text-white py-1 px-3 rounded-full whitespace-nowrap`}>Verified</p>
                         </div>
                     </div>
                 </div>

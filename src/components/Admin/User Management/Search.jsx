@@ -3,7 +3,7 @@ import banned from './assets/banned.svg'
 import deactivated from './assets/deactivated.svg'
 import admins from './assets/admins.png'
 
-function Search({setFilter, searchQuery, setSearchQuery}) {
+function Search({openVerify, setFilter, searchQuery, setSearchQuery}) {
     return (
         <div className='relative px-2'>
             {/* MOBILE VIEW */}
@@ -27,6 +27,11 @@ function Search({setFilter, searchQuery, setSearchQuery}) {
                             <p className='text-xs font-medium'>Admins</p>
                         </button>
                     </div>
+
+                    {/* USER VERIFICATIONS */}
+                    <div className='flex mt-1'>
+                        <button onClick={openVerify} className='bg-[#D9D9D9] py-2 hover:bg-[#cecece] duration-150 font-medium text-sm text-text w-full rounded-md'>Verification Request</button>
+                    </div>
                 </div>
             </div>
 
@@ -49,6 +54,11 @@ function Search({setFilter, searchQuery, setSearchQuery}) {
                             <img className='w-7 h-7' src={banned} alt="" />
                             <p className='text-sm font-medium'>Banned</p>
                         </button>
+                    </div>
+
+                    {/* USER VERIFICATIONS */}
+                    <div className='flex mt-2'>
+                        <button onClick={openVerify} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 py-2 font-medium text-sm text-text w-full rounded-md'>Verification Request</button>
                     </div>
                 </div>
             </div>

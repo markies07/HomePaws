@@ -47,6 +47,7 @@ import AdApplication from "./components/Admin/Profile/Application"
 import AdRehomedPets from "./components/Admin/Profile/RehomedPets"
 import AdNewsFeed from "./components/Admin/News Feed/NewsFeed"
 import AdViewProfile from "./components/Admin/Profile/View Profile/ViewProfile"
+import Verification from "./components/Admin/User Management/Verification"
 
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
                         {/* USER MANAGEMENT SECTION */}
                         <Route path="user-management" element={<UserManagement />} />
                         <Route path="user-management/profile/:userID" element={<UserProfile />} />
+                        <Route path="user-management/verification/:verifyID" element={<Verification />} />
 
                         {/* ADOPTION STATISTICS */}
                         <Route path="adoption-stats" element={<AdoptionStatistics />} />
@@ -85,6 +87,7 @@ function App() {
                         <Route path="report-management" element={<ReportManagement />} />
                         <Route path="report-management/reason/user/:reportID" element={<Reason />} />
                         <Route path="report-management/reason/post/:reportID" element={<Reason />} />
+
 
 
                         {/* NOTIFICATIONS */}

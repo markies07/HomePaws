@@ -17,7 +17,6 @@ function Actions({data, closeUI}) {
                     <DeactivateUser data={data} />
                     <BanUser userName={data.fullName} userEmail={data.email} data={data}/>
                 </div>
-                
             </div>
         </div>
     )

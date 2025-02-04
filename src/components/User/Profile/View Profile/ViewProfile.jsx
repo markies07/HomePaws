@@ -225,6 +225,10 @@ function ViewProfile() {
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                     <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
                                 </div>
+                                <div className={`${data.role === 'admin' || data.role === 'superadmin' ? 'hidden' : 'block'}`}>
+                                    <p className={`${data.isVerified === true ? 'hidden' : 'block'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Unverified</p>
+                                    <p className={`${data.isVerified === false ? 'hidden' : 'block'} bg-[#80A933] text-white py-1 px-3 rounded-full whitespace-nowrap`}>Verified</p>
+                                </div>
                                 <p className={`${data.role === 'admin' || data.role === 'superadmin' ? 'block' : 'hidden'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Admin</p>
                             </div>
                         </div>
