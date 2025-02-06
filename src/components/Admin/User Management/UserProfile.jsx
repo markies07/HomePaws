@@ -18,6 +18,7 @@ function UserProfile() {
     const {user, userData} = useContext(AuthContext);
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(false);
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
     const [isActionOpen, setIsActionOpen] = useState(false);
@@ -33,6 +34,7 @@ function UserProfile() {
     // FETCHING USER DATA
     useEffect(() => {
         const fetchUserProfile = async () => {
+            setLoadingData(true);
             try {
                 // Check if the user exists in the 'bannedUsers' collection first
                 const bannedRef = doc(db, 'bannedUsers', userID);
@@ -67,6 +69,10 @@ function UserProfile() {
                 }
             } catch (error) {
                 console.error(error);
+                setLoadingData(false);
+            }
+            finally{
+                setLoadingData(false);
             }
         };
 
@@ -218,12 +224,16 @@ function UserProfile() {
                     </div>
                     <div className='flex flex-col md:items-start md:ml-5'>
                         <p className='font-medium text-xl text-center leading-3 mb-4 md:mb-1 md:text-2xl md:text-start'>{data.fullName}</p>
-                        <div className='text-white text-xs flex justify-center gap-1 flex-wrap'>
+                        <div className={`${loadingData ? 'hidden' : 'flex'} text-white text-xs justify-center gap-1 flex-wrap`}>
                             <p className={`${data.role === 'admin' ? 'block' : 'hidden'} text-xs bg-text rounded-full text-white px-2 py-1`}>Admin</p>
                             <p className={`bg-primary py-1 px-3 rounded-full whitespace-nowrap ${data.petOwnerType !== 'Both' ? 'block' : 'hidden'}`}>{data.petOwnerType}</p>
                             <div className={data.petOwnerType === 'Both' ? 'flex gap-1' : 'hidden'}>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Dog Owner</p>
                                 <p className='bg-primary py-1 px-3 rounded-full whitespace-nowrap'>Cat Owner</p>
+                            </div>
+                            <div className={`${data.role === 'admin' || data.role === 'superadmin' ? 'hidden' : 'block'}`}>
+                                <p className={`${data.isVerified === true ? 'hidden' : 'block'} bg-text text-white py-1 px-3 rounded-full whitespace-nowrap`}>Unverified</p>
+                                <p className={`${data.isVerified === false ? 'hidden' : 'block'} bg-[#80A933] text-white py-1 px-3 rounded-full whitespace-nowrap`}>Verified</p>
                             </div>
                         </div>
                         <p className={`${data.violationsCount >= 1 ? 'sm:block' : 'hidden'} hidden pt-2 text-center sm:text-sm text-xs `}>Violation: {data.violationsCount}</p>

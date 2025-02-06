@@ -171,6 +171,9 @@ function Notification() {
                 navigate(`report/post/${reportID}`, {state: {notifType}});
             }
         }
+        else if(notifType === 'verification'){
+            navigate(`/dashboard/profile`);
+        }
     }
 
     return (

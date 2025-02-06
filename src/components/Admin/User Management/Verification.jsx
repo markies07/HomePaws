@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import close from './assets/close.svg'
-import { useParams } from 'react-router-dom'
-import { doc, getDoc } from 'firebase/firestore';
+import { useNavigate, useParams } from 'react-router-dom'
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
+import { useImageModal } from '../../General/ImageModalContext';
+import paws from './assets/paws.svg';
+import { AuthContext } from '../../General/AuthProvider';
+import { confirm, successAlert } from '../../General/CustomAlert';
 
 function Verification() {
+    const {user} = useContext(AuthContext);
     const {verifyID} = useParams();
     const [verificationData, setVerificationData] = useState(null);
     const [userData, setUserData] = useState(null);
+    const {showModal} = useImageModal();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchVerificationData = async () => {
@@ -41,6 +48,47 @@ function Verification() {
     }, [verifyID]);
 
 
+    const handleAccept = async () => {
+        confirm(`Approve Verification`, `Are you sure you want to approve ${userData.fullName}'s identity verification?`).then(async (result) => {
+            if(result.isConfirmed){
+                try {
+                    const userRef = doc(db, "users", verificationData.userID);
+                    const verifiedUserRef = doc(db, "verifiedUsers", verificationData.userID);
+                    const pendingRef = doc(db, "pendingVerification", verifyID);
+                    const notificationRef = doc(db, "notifications", `${verificationData.userID}_verification`);
+        
+                    // Update user to be verified
+                    await updateDoc(userRef, { isVerified: true });
+        
+                    // Move data to verifiedUsers
+                    await setDoc(verifiedUserRef, { ...verificationData, verifiedAt: new Date() });
+        
+                    // Delete from pendingVerification
+                    await deleteDoc(pendingRef);
+        
+                    // Send notification
+                    await setDoc(notificationRef, {
+                        content: "has been approved!",
+                        senderName: 'Your identity verification',
+                        type: 'verification',
+                        image: paws,
+                        senderId: user.uid,
+                        userId: verificationData.userID,
+                        isRead: false,
+                        timestamp: serverTimestamp(),
+                    });
+        
+                    successAlert("Verification Approved!");
+                    navigate(`/admin/user-management/profile/${verificationData.userID}`); // Go back
+                } catch (error) {
+                    console.error("Error accepting verification:", error);
+                }
+            }
+        });
+
+    };
+
+
     return (
         <div className='pt-36 lg:pt-20 lg:pl-56 pb-3 lg:ml-3 sm:px-3 z-30 lg:pr-3 flex flex-col font-poppins text-text'>
             <div className='bg-secondary flex flex-col mt-3 py-3 px-5 sm:p-5 relative w-full shadow-custom h-full min-h-[calc(100dvh-170px)] lg:min-h-[calc(100dvh-105px)] sm:rounded-md lg:rounded-lg'>
@@ -51,7 +99,7 @@ function Verification() {
                     {/* ID PICTURE */}
                     <div className='flex flex-col items-center gap-2'>
                         <div className='flex justify-center overflow-hidden items-center bg-text w-60 sm:w-72 h-36 sm:h-40 shadow-custom rounded-md'>
-                            <img className='w-full object-cover ' src={verificationData?.idPic} alt="" />
+                            <img onClick={() => showModal(verificationData?.idPic)} className='w-full cursor-pointer object-cover ' src={verificationData?.idPic} alt="" />
                         </div>
                     </div>
 
@@ -62,7 +110,7 @@ function Verification() {
                                 <img className='w-10 h-10 rounded-full object-cover' src={userData?.profilePictureURL} alt="" />
                                 <p className='font-medium pr-2 leading-5'>{userData?.fullName}</p>
                             </div>
-                            <button className='bg-primary hover:bg-primaryHover duration-150 text-white font-medium leading-3 text-xs px-2 rounded-md'>View Profile</button>
+                            <button onClick={() => navigate(`/admin/user-management/profile/${userData.uid}`)} className='bg-primary hover:bg-primaryHover duration-150 text-white font-medium leading-3 text-xs px-2 rounded-md'>View Profile</button>
                         </div>
 
                         <div className='w-full flex gap-3'>
@@ -90,7 +138,7 @@ function Verification() {
 
                     {/* BUTTONS */}
                     <div className='mt-10 flex gap-5'>
-                        <button className='bg-[#84B725] hover:bg-[#71a315] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>ACCEPT</button>
+                        <button onClick={() => handleAccept()} className='bg-[#84B725] hover:bg-[#71a315] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>APPROVE</button>
                         <button className='bg-[#D25A5A] hover:bg-[#b64f4f] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>REJECT</button>
                     </div>
                     
