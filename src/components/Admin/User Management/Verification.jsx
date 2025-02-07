@@ -7,6 +7,7 @@ import { useImageModal } from '../../General/ImageModalContext';
 import paws from './assets/paws.svg';
 import { AuthContext } from '../../General/AuthProvider';
 import { confirm, successAlert } from '../../General/CustomAlert';
+import Reason from './Reason';
 
 function Verification() {
     const {user} = useContext(AuthContext);
@@ -14,6 +15,7 @@ function Verification() {
     const [verificationData, setVerificationData] = useState(null);
     const [userData, setUserData] = useState(null);
     const {showModal} = useImageModal();
+    const [isRejectOpen, setIsRejectOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -79,7 +81,7 @@ function Verification() {
                     });
         
                     successAlert("Verification Approved!");
-                    navigate(`/admin/user-management/profile/${verificationData.userID}`); // Go back
+                    navigate(`/admin/user-management/profile/${verificationData.userID}`); 
                 } catch (error) {
                     console.error("Error accepting verification:", error);
                 }
@@ -87,6 +89,10 @@ function Verification() {
         });
 
     };
+
+    const toggleReject = () => {
+        setIsRejectOpen(!isRejectOpen);
+    }
 
 
     return (
@@ -139,11 +145,16 @@ function Verification() {
                     {/* BUTTONS */}
                     <div className='mt-10 flex gap-5'>
                         <button onClick={() => handleAccept()} className='bg-[#84B725] hover:bg-[#71a315] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>APPROVE</button>
-                        <button className='bg-[#D25A5A] hover:bg-[#b64f4f] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>REJECT</button>
+                        <button onClick={toggleReject} className='bg-[#D25A5A] hover:bg-[#b64f4f] duration-150 px-3 py-2 font-medium text-sm text-white rounded-md'>REJECT</button>
                     </div>
                     
                 </div>
-                
+
+                {/* REJECT */}
+                <div className={`${isRejectOpen ? 'block' : 'hidden'}`}>
+                    <Reason verificationData={verificationData} userData={userData} closeReject={toggleReject} />
+                </div>
+
             </div>
         </div>
     )
