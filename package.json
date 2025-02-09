@@ -20,6 +20,7 @@
     "firebase-admin": "^12.6.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",

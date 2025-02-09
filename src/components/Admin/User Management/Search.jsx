@@ -1,9 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import banned from './assets/banned.svg'
 import deactivated from './assets/deactivated.svg'
 import admins from './assets/admins.png'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
+import { db } from '../../../firebase/firebase'
 
 function Search({openVerify, setFilter, searchQuery, setSearchQuery}) {
+    const [hasUnseenVerification, setHasUnseenVerification] = useState(false);
+
+    useEffect(() => {
+         // Listener for unread pending verifications
+         const verificationRef = collection(db, 'pendingVerification');
+         const verificationQuery = query(verificationRef, where('isRead', '==', false));
+     
+         const unsubscribeVerification = onSnapshot(verificationQuery, (snapshot) => {
+             setHasUnseenVerification(!snapshot.empty);
+         });
+
+         return () => {
+            unsubscribeVerification();
+        };
+    }, [])
+
     return (
         <div className='relative px-2'>
             {/* MOBILE VIEW */}
@@ -30,7 +48,12 @@ function Search({openVerify, setFilter, searchQuery, setSearchQuery}) {
 
                     {/* USER VERIFICATIONS */}
                     <div className='flex mt-1'>
-                        <button onClick={openVerify} className='bg-[#D9D9D9] py-2 hover:bg-[#cecece] duration-150 font-medium text-sm text-text w-full rounded-md'>Verification Request</button>
+                        <button onClick={openVerify} className='bg-[#D9D9D9] relative py-2 hover:bg-[#cecece] duration-150 font-medium text-sm text-text w-full rounded-md'>Verification Request
+                            {/* NOTIFICATION */}
+                            {hasUnseenVerification && (
+                                <div className='absolute w-5 h-5 rounded-full border-2 border-secondary bg-primary -right-1 -top-1'/>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -58,7 +81,12 @@ function Search({openVerify, setFilter, searchQuery, setSearchQuery}) {
 
                     {/* USER VERIFICATIONS */}
                     <div className='flex mt-2'>
-                        <button onClick={openVerify} className='bg-[#D9D9D9] hover:bg-[#cecece] duration-150 py-2 font-medium text-sm text-text w-full rounded-md'>Verification Request</button>
+                        <button onClick={openVerify} className='bg-[#D9D9D9] relative hover:bg-[#cecece] duration-150 py-2 font-medium text-sm text-text w-full rounded-md'>Verification Request
+                            {/* NOTIFICATION */}
+                            {hasUnseenVerification && (
+                                <div className='absolute w-5 h-5 rounded-full border-2 border-secondary bg-primary -right-1 -top-1'/>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>

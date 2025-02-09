@@ -25,59 +25,70 @@ function NavBar() {
     const [hasUnseenNotif, setHasUnseenNotif] = useState(false);
     const [hasUnseenMess, setHasUnseenMess] = useState(false);
     const [hasUnseenReport, setHasUnseenReport] = useState(false);
+    const [hasUnseenVerification, setHasUnseenVerification] = useState(false); // New state
     
     useEffect(() => {
-      if (!user || !user.uid) return;
+        if (!user || !user.uid) return;
     
-      // Listener for unseen notifications
-      const notificationRef = collection(db, 'notifications');
-      const notificationQuery = query(notificationRef, where('userId', '==', user.uid), where('isRead', '==', false));
+        // Listener for unseen notifications
+        const notificationRef = collection(db, 'notifications');
+        const notificationQuery = query(notificationRef, where('userId', '==', user.uid), where('isRead', '==', false));
     
-      const unsubscribeNotifications = onSnapshot(notificationQuery, (snapshot) => {
-        setHasUnseenNotif(!snapshot.empty); // Set to true if unseen notifications exist
-      });
+        const unsubscribeNotifications = onSnapshot(notificationQuery, (snapshot) => {
+            setHasUnseenNotif(!snapshot.empty);
+        });
     
-      // Listener for unseen messages
-      const chatQuery = query(
-        collection(db, 'chats'),
-        where('participants', 'array-contains', user.uid)
-      );
+        // Listener for unseen messages
+        const chatQuery = query(
+            collection(db, 'chats'),
+            where('participants', 'array-contains', user.uid)
+        );
     
-      const unsubscribeMessages = onSnapshot(chatQuery, async (chatSnapshot) => {
-        let hasUnseenMessages = false;
+        const unsubscribeMessages = onSnapshot(chatQuery, async (chatSnapshot) => {
+            let hasUnseenMessages = false;
     
-        const checkMessages = async () => {
-          for (const chatDoc of chatSnapshot.docs) {
-            const messagesRef = collection(db, `chats/${chatDoc.id}/messages_${user.uid}`);
-            const unseenMessagesQuery = query(messagesRef, where('read', '==', false));
+            const checkMessages = async () => {
+                for (const chatDoc of chatSnapshot.docs) {
+                    const messagesRef = collection(db, `chats/${chatDoc.id}/messages_${user.uid}`);
+                    const unseenMessagesQuery = query(messagesRef, where('read', '==', false));
     
-            const messagesSnapshot = await getDocs(unseenMessagesQuery);
-            if (!messagesSnapshot.empty) {
-              hasUnseenMessages = true;
-              break; // Stop checking further if an unread message is found
-            }
-          }
+                    const messagesSnapshot = await getDocs(unseenMessagesQuery);
+                    if (!messagesSnapshot.empty) {
+                        hasUnseenMessages = true;
+                        break; // Stop checking further if an unread message is found
+                    }
+                }
+            };
+    
+            await checkMessages();
+            setHasUnseenMess(hasUnseenMessages);
+        });
+    
+        // Listener for unseen user reports
+        const reportsRef = collection(db, 'userReports');
+        const reportsQuery = query(reportsRef, where('read', '==', false));
+    
+        const unsubscribeReports = onSnapshot(reportsQuery, (snapshot) => {
+            setHasUnseenReport(!snapshot.empty);
+        });
+    
+        // Listener for unread pending verifications
+        const verificationRef = collection(db, 'pendingVerification');
+        const verificationQuery = query(verificationRef, where('isRead', '==', false));
+    
+        const unsubscribeVerification = onSnapshot(verificationQuery, (snapshot) => {
+            setHasUnseenVerification(!snapshot.empty);
+        });
+    
+        // Cleanup listeners on unmount
+        return () => {
+            unsubscribeNotifications();
+            unsubscribeMessages();
+            unsubscribeReports();
+            unsubscribeVerification(); // Cleanup new listener
         };
-    
-        await checkMessages();
-        setHasUnseenMess(hasUnseenMessages);
-      });
-    
-      // Listener for unseen user reports
-      const reportsRef = collection(db, 'userReports');
-      const reportsQuery = query(reportsRef, where('read', '==', false));
-    
-      const unsubscribeReports = onSnapshot(reportsQuery, (snapshot) => {
-        setHasUnseenReport(!snapshot.empty); // Set to true if unseen reports exist
-      });
-    
-      // Cleanup listeners on unmount
-      return () => {
-        unsubscribeNotifications();
-        unsubscribeMessages();
-        unsubscribeReports();
-      };
     }, [user.uid]);
+    
 
 
     return (
@@ -93,9 +104,15 @@ function NavBar() {
                 </NavLink>
 
                 {/* USER MANAGEMENT */}
-                <NavLink to="/admin/user-management" className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
+                <NavLink to="/admin/user-management" onClick={() => setHasUnseenVerification(false)} className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
                 {({isActive}) => (
-                    <img className='w-8 h-7' src={isActive ? activeaUsersTab : usersTab} alt="Paw Icon" />
+                    <div className='relative'>
+                        <img className='w-8 h-7' src={isActive ? activeaUsersTab : usersTab} alt="Paw Icon" />
+                        {/* NOTIFICATION */}
+                        {hasUnseenVerification && (
+                            <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary -right-1 -top-1'/>
+                        )}
+                    </div>
                 )}
                 </NavLink>
 
@@ -107,7 +124,7 @@ function NavBar() {
                 </NavLink>
 
                 {/* REPORT MANAGEMENT */}
-                <NavLink to="/admin/report-management" className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
+                <NavLink to="/admin/report-management" onClick={() => setHasUnseenReport(false)} className={({ isActive }) => isActive ? 'py-2 bg-primary cursor-pointer duration-150 px-2 rounded-md' : 'py-2 hover:bg-[#D9D9D9] cursor-pointer duration-150 px-2 rounded-md'}>
                 {({isActive}) => (
                     <div className='relative'>
                         <img className='w-8 h-7' src={isActive ? activeReport : report} alt="Paw Icon" />
@@ -175,11 +192,15 @@ function NavBar() {
                     </NavLink>
 
                     {/* USER MANAGEMENT */}
-                    <NavLink to="/admin/user-management" className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
+                    <NavLink to="/admin/user-management" onClick={() => setHasUnseenVerification(false)} className={({ isActive }) => isActive ? 'bg-primary flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
                         {({isActive}) => (
-                        <div className='flex items-center'>
+                        <div className='flex items-center relative'>
                             <img className='pl-5 w-12' src={ isActive ? activeaUsersTab : usersTab} alt="" />
                             <p className={isActive ? 'text-base text-white font-medium pl-4 leading-4' : 'text-base text-text font-medium leading-4 pl-4'}>User Management</p>
+                            {/* NOTIFICATION */}
+                            {hasUnseenVerification && (
+                                <div className='absolute w-4 h-4 rounded-full border-2 border-secondary bg-primary left-10 top-2'/>
+                            )}
                         </div>
                         )}
                     </NavLink>
@@ -195,7 +216,7 @@ function NavBar() {
                     </NavLink>
 
                     {/* REPORT MANAGEMENT */}
-                    <NavLink to="/admin/report-management" className={({ isActive }) => isActive ? 'bg-primary relative flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
+                    <NavLink to="/admin/report-management" onClick={() => setHasUnseenReport(false)} className={({ isActive }) => isActive ? 'bg-primary relative flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-primary shrink-0' : 'flex duration-150 cursor-pointer -ml-1 h-14 rounded-lg w-48 hover:bg-[#D9D9D9] shrink-0'}>
                         {({isActive}) => (
                         <div className='flex items-center relative'>
                             <img className='pl-5 w-12' src={ isActive ? activeReport : report} alt="" />
