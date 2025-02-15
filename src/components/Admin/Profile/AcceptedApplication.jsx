@@ -260,7 +260,7 @@ function AcceptedApplication() {
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Pet Owner:</p>
-                                    <p>{pet.ownerName}</p>
+                                    <p>{pet.ownerFirstName} {pet.ownerMI} {pet.ownerLastName}</p>
                                 </div>
                                 <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                     <p className='font-semibold'>Location:</p>
@@ -287,7 +287,7 @@ function AcceptedApplication() {
                                     <div className='w-full flex flex-col gap-2'>
                                         <div className='bg-secondary w-full shadow-custom p-2 sm:p-3 rounded-md'>
                                             <p className='font-semibold'>Full Name:</p>
-                                            <p>{data.adopterName}</p>
+                                            <p>{data.adopterFirstName} {data.adopterMI} {data.adopterLastName}</p>
                                         </div>
                                         <div className='flex gap-2'>
                                             <div className='bg-secondary w-[30%] shadow-custom p-2 sm:p-3 rounded-md'>

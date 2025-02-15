@@ -25,6 +25,7 @@ function Conversation() {
     const [imageUrl, setImageUrl] = useState(null);
     const [loading, setLoading] = useState(true);
     const { showModal } = useImageModal();
+    const [isSending, setIsSending] = useState(false);
 
     // FETCHING MESSAGES
     useEffect(() => {
@@ -97,6 +98,7 @@ function Conversation() {
     
     // For sending messages
     const handleSendMessage = async (imageUrl = null) => {
+        setIsSending(true);
         // Prevent page reload is handled in form submission
         const chatRef = doc(db, 'chats', chatID);
         const chatDoc = await getDoc(chatRef);
@@ -151,6 +153,10 @@ function Conversation() {
         } catch (error) {
             console.error('Error sending message: ', error);
             notifyErrorOrange('Error sending message. Please try again.');
+            setIsSending(false);
+        }
+        finally{
+            setIsSending(false);
         }
     };
 
@@ -319,7 +325,7 @@ function Conversation() {
                     <input type="file" accept='image/*' onChange={handleImageUpload} className='hidden' ref={imageInputRef} />
                     <img onClick={() => imageInputRef.current.click()} className='w-10 overflow-visible p-[9px] bg-[#BCBCBC] hover:bg-[#adadad] cursor-pointer duration-150 rounded-full' src={image} alt="" />
                     <input required value={newMessage} onChange={(e) => setNewMessage(e.target.value)} className='w-full mx-4 rounded-full px-3 outline-none' placeholder='Aa' type="text" />
-                    <button type='submit' className='w-10 shrink-0 h-10 flex justify-center items-center overflow-visible bg-[#BCBCBC] hover:bg-[#adadad] cursor-pointer duration-150 rounded-full'>
+                    <button disabled={isSending} type='submit' className='w-10 shrink-0 h-10 flex justify-center items-center overflow-visible bg-[#BCBCBC] hover:bg-[#adadad] cursor-pointer duration-150 rounded-full'>
                         <img className='w-6 h-6 ml-1' src={send} alt="" />
                     </button>
                 </form>

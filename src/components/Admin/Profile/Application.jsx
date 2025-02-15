@@ -197,7 +197,7 @@ function Application() {
                         <div className='w-full flex gap-2 sm:gap-3 mb-2 sm:mb-3'>
                             <div className='flex flex-col shadow-custom w-[75%] leading-6 bg-secondary p-2 sm:p-3 lg:p-4 rounded-md'>
                                 <p className='font-semibold'>Full Name:</p>
-                                <p>{applicationData.adopterName}</p>
+                                <p className='capitalize'>{applicationData.adopterFirstName} {applicationData.adopterMI}. {applicationData.adopterLastName}</p>
                             </div>
                             <div className='flex flex-col shadow-custom w-[25%] leading-6 bg-secondary p-2 sm:p-3 lg:p-4 rounded-md'>
                                 <p className='font-semibold'>Gender:</p>
@@ -227,7 +227,7 @@ function Application() {
                         <div className='w-full flex gap-2 sm:gap-3 mb-2 sm:mb-3'>
                             <div className='flex flex-col shadow-custom w-full leading-6 bg-secondary p-2 sm:p-3 lg:p-4 rounded-md'>
                                 <p className='font-semibold'>Full Address:</p>
-                                <p>{applicationData.fullAddress}</p>
+                                <p>{applicationData.barangay} {applicationData.municipality}, Cavite</p>
                             </div>
                         </div>
                     </div>

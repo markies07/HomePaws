@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import NavBar from './NavBar'
 import Header from './Header'
 import Question from './Question';
@@ -10,6 +10,7 @@ import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import MeetupChecker from './MeetupChecker';
 import Search from './Search';
 import ActivityTracker from '../General/ActivityTracker';
+import { checkFollowUps } from '../General/checkFollowups';
 
 function Dashboard() {
     const { user } = useContext(AuthContext);
@@ -17,7 +18,24 @@ function Dashboard() {
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [searchIsOpen, setSearchIsOpen] = useState(false);
-
+    const [followUpChecked, setFollowUpChecked] = useState(false);
+  
+    useEffect(() => {
+      if (user?.uid && !followUpChecked) {
+        console.log("Calling checkFollowUps with UID:", user.uid);
+        
+        checkFollowUps({userID: user.uid})
+          .then(result => {
+            console.log("Follow-up check result:", result);
+            setFollowUpChecked(true);
+          })
+          .catch(err => {
+            console.error("Error checking follow-ups:", err);
+            setFollowUpChecked(true);
+          });
+      }
+    }, []);
+      
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -75,6 +93,8 @@ function Dashboard() {
     const toggleSearch = () => {
         setSearchIsOpen(!searchIsOpen);
     }
+
+
 
     if(isLoading){
         return <LoadingScreen />

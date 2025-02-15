@@ -67,11 +67,26 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
                     };
                     batch.set(rehomedRef, rehomedData);
 
-                    // Step 2: Delete the application from `adoptionApplications`
+                    // Step 2: Store follow-up data in `followUps` collection
+                    const followUpRef = doc(collection(db, 'followUps'));
+                    batch.set(followUpRef, {
+                        petID: pet.petID,
+                        petName: pet.petName,
+                        previousOwnerID: pet.userID,
+                        previousOwnerName: pet.ownerFirstName + " " + pet.ownerLastName,
+                        adopterID: data.adopterUserID,
+                        adopterName: data.adopterFirstName + " " + data.adopterLastName,
+                        rehomedDate: serverTimestamp(),
+                        nextNotificationDate: new Date(new Date().setDate(new Date().getDate() + 7)), // First follow-up in 7 days
+                        notificationsSent: 0,
+                        petImage: pet.petImages[0]
+                    });
+
+                    // Step 3: Delete the application from `adoptionApplications`
                     const adoptionApplicationRef = doc(db, 'adoptionApplications', data.applicationID);
                     batch.delete(adoptionApplicationRef);
 
-                    // Step 3: Notify both users that rehoming is completed
+                    // Step 4: Notify both users that rehoming is completed
                     const petImage = pet.petImages && pet.petImages.length > 0 ? pet.petImages[0] : rehomed;
 
                     const petOwnerNotificationRef = doc(collection(db, 'notifications'));
@@ -101,7 +116,7 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
                         senderName: pet.petName,
                     });
 
-                    // Step 4: Move remaining applications to `closedApplications` and notify users
+                    // Step 5: Move remaining applications to `closedApplications` and notify users
                     const applicationsQuery = query(
                         collection(db, 'adoptionApplications'),
                         where('petID', '==', data.petID),
@@ -140,7 +155,7 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
                         });
                     });
 
-                    // Step 5: Delete all related notifications for the current applicationID
+                    // Step 6: Delete all related notifications for the current applicationID
                     const notificationsQuery = query(
                         collection(db, 'notifications'),
                         where('applicationID', '==', data.applicationID)
@@ -162,11 +177,11 @@ function RehomedComplete({ data, pet, adopter, isMeetup }) {
                         batch.delete(notificationDoc.ref);
                     });
 
-                    // Step 6: Delete from `acceptedApplications`
+                    // Step 7: Delete from `acceptedApplications`
                     const acceptedApplicationRef = doc(db, 'acceptedApplications', data.applicationID);
                     batch.delete(acceptedApplicationRef);
 
-                    // Step 7: Delete the pet information from `petsForAdoption`
+                    // Step 8: Delete the pet information from `petsForAdoption`
                     const petsForAdoptionRef = doc(db, 'petsForAdoption', data.petID);
                     batch.delete(petsForAdoptionRef);
 
