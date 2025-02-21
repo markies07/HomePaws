@@ -8,7 +8,7 @@ function MeetTheTeam({closeCreator}) {
     return (
         <div className=' justify-center items-center px-5 py-5 sm:px-10 sm:py-10 bg-secondary min-h-screen w-full flex flex-col text-text font-poppins'>
             <div className='pb-10'>
-                <div className='absolute top-4 right-4 border-2 border-secondary hover:border-text cursor-pointer p-1 duration-150'>
+                <div className='absolute top-4 z-10 right-4 border-2 border-secondary hover:border-text cursor-pointer p-1 duration-150'>
                     <img onClick={closeCreator} className='w-6 h-6 sm:w-7 sm:h-7' src={close} alt="" />
                 </div>
 

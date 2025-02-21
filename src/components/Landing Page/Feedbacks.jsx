@@ -45,7 +45,7 @@ function Feedbacks() {
                     <p className='text-center font-medium'>Loading Feedback ...</p>
                 ) :
                 feedbacks.map((feedback) => (
-                    <div key={feedback.id} className='shadow-custom flex flex-col justify-between lg:w-64 w-[80%] mx-auto rounded-lg p-5 relative'>
+                    <div key={feedback.id} className='shadow-custom flex flex-col justify-between lg:w-64 w-auto mx-auto rounded-lg p-5 relative'>
 
                         {/* USER PROFILE */}
                         <div className='flex flex-col items-center gap-2 absolute -top-7 left-0 w-full'>

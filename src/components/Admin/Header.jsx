@@ -8,7 +8,7 @@ import { notifyErrorOrange } from '../General/CustomToast';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/firebase'
 
-function Header() {
+function Header({openEdit}) {
     const {user, userData} = useContext(AuthContext);
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const navigate = useNavigate();
@@ -47,6 +47,12 @@ function Header() {
                             <img src={paw} className='w-full' alt="" />
                         </div>
                     </div>
+
+                    {/* EDIT ABOUT US */}
+                    <div className={`${userData.role === 'superadmin' ? 'block' : 'hidden'} mb-3 -mt-3 ml-7`}>
+                        <button onClick={openEdit} className='bg-primary mt-2 text-sm px-4 self-center hover:bg-primaryHover duration-150 py-1 rounded-md text-white font-medium'>Edit About Us</button>
+                    </div>
+
                     <button onClick={handleLogout} className='w-full px-7 py-3 cursor-pointer hover:bg-primaryHover duration-150 bg-primary rounded-md flex items-center justify-between'>
                         <p className='font-medium text-secondary'>Log out</p>
                         <img className='w-[9px]' src={logout} alt="" />
